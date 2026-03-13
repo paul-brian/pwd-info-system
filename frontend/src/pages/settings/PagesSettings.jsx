@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import AdminSettings from "../settings/AdminSettings"; // existing UI
 import UserSettings from '../settings/UserSettings';
-import StaffSettings from './staffSettings';
+import StaffSettings from './StaffSettings';
 import { ROLES } from '../Auth/roles';
 
 const PagesSettings = () => {
