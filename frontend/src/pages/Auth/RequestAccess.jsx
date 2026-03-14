@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
+import API_URL from "../api/api";
 
 const RequestAccess = () => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ const RequestAccess = () => {
 
     try {
       // ✅ Correct endpoint and field names to match backend
-      const res = await axios.post("http://localhost:5000/api/access/request", 
+      const res = await axios.post(`${API_URL}/api/access/request`, 
         {
           full_name: form.fullName,  // matches DB column
           email: form.email,

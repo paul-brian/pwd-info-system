@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
+import API_URL from "../api/api";
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = API_URL;
 const API = `${BASE_URL}/api`;
 
 const getToken = () =>

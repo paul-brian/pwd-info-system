@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
+import API_URL from "../api/api";
 
 
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = `${API_URL}/api`;
 
 // ─── SHARED HELPERS ────────────────────────────────────────────────────────────
 

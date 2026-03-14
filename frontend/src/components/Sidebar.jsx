@@ -1,8 +1,9 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { menuItems } from "../config/menu";
+import API_URL from "../api/api";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = API_URL;
 
 /* Nav Item */
 const NavItem = ({ to, icon, label, onClick }) => (

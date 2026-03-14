@@ -448,6 +448,7 @@
 
 import React, { useState, useEffect } from "react";
 import ProfileSettings from "./profileSettings";
+import API_URL from "../api/api";
 
 const AdminSettings = () => {
 
@@ -464,7 +465,7 @@ const AdminSettings = () => {
   const fetchUsers = async () => {
     try {
       setLoadingUsers(true);
-      const res = await fetch("http://localhost:5000/api/users");
+      const res = await fetch(`${API_URL}/api/users`);
       const data = await res.json();
       setUsers(data);
     } catch (err) {
@@ -486,7 +487,7 @@ const AdminSettings = () => {
 
   const handleEdit = async () => {
     try {
-      await fetch(`http://localhost:5000/api/users/edit/${editUser.user_id}`, {
+      await fetch(`${API_URL}/api/users/edit/${editUser.user_id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -507,7 +508,7 @@ const AdminSettings = () => {
   const handleToggleStatus = async (user) => {
     const updatedStatus = user.status === "active" ? "inactive" : "active";
     try {
-      await fetch(`http://localhost:5000/api/users/status/${user.user_id}`, {
+      await fetch(`${API_URL}/api/users/status/${user.user_id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: updatedStatus }),
@@ -531,7 +532,7 @@ const AdminSettings = () => {
   const fetchAccessRequests = async () => {
     try {
       setLoadingRequests(true);
-      const res = await fetch("http://localhost:5000/api/access/requests");
+      const res = await fetch(`${API_URL}/api/access/requests`);
       const data = await res.json();
       const mapped = (Array.isArray(data) ? data : data.data || []).map((r) => ({
         id: r.request_id,
@@ -558,8 +559,8 @@ const AdminSettings = () => {
     try {
       const endpoint =
         status === "approved"
-          ? `http://localhost:5000/api/access/approve/${selectedRequest.id}`
-          : `http://localhost:5000/api/access/reject/${selectedRequest.id}`;
+          ? `${API_URL}/api/access/approve/${selectedRequest.id}`
+          : `${API_URL}/api/access/reject/${selectedRequest.id}`;
       const res = await fetch(endpoint, { method: "PUT", headers: { "Content-Type": "application/json" } });
       if (!res.ok) throw new Error("Failed to update status");
       setAccessRequests((prev) =>
@@ -671,7 +672,7 @@ const AdminSettings = () => {
                           <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex-shrink-0 border border-slate-300 dark:border-slate-600 overflow-hidden">
                             {user.image ? (
                               <img
-                                src={`http://localhost:5000/uploads/${user.image}`}
+                                src={`${API_URL}/uploads/${user.image}`}
                                 alt={user.full_name}
                                 className="w-full h-full object-cover"
                                 onError={(e) => { e.target.style.display = "none"; }}

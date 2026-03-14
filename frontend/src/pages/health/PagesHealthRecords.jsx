@@ -217,9 +217,10 @@
 // export default AdminHealthRecords;
 
 import { useState, useEffect } from "react";
+import API_URL from "../api/api";
 import axios from "axios";
 
-const API_BASE = "http://localhost:5000/api/health";
+const API_BASE = `${API_URL}/api/health`;
 
 // Helper to map DB row → display format
 const mapRecord = (r) => ({

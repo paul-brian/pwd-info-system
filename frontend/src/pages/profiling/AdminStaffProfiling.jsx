@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import API_URL from "../api/api";
 import Cards from "../../components/Cards";
 import Buttons from "../../components/Buttons";
 
 // backend base
-const API_URL = "http://localhost:5000/api/pwd";
+const API_URL = `${API_URL}/api/pwd`;
 
 // Tailwind-safe dynamic colors mapping
 const colorClasses = {

@@ -193,10 +193,11 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Cards from "../../components/Cards";
+import API_URL from "../api/api";
 
 /* ================= API ================= */
-const EVENT_API = "http://localhost:5000/api/events";
-const ATT_API = "http://localhost:5000/api/attendance";
+const EVENT_API = `${API_URL}/api/events`;
+const ATT_API = `${API_URL}/api/attendance`;
 
 /* ================= STATUS BADGE ================= */
 const statusBadge = {

@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import API_URL from "../api/api";
 import RecentLogs from "../../features/dashbord/RecentLogs";
 import { useNavigate } from "react-router-dom";
 import PWDActionModal from "../../features/dashbord/PwdAction";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = API_URL;
 const API = `${BASE_URL}/api/dashboard`;
 
 

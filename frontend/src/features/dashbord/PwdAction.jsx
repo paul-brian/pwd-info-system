@@ -1,4 +1,6 @@
-const BASE_URL = "http://localhost:5000"; 
+import API_URL from "../api/api";
+
+const BASE_URL = API_URL;
 
 const PWDActionModal = ({ pwd, onClose }) => {
   const initials = pwd?.full_name?.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
