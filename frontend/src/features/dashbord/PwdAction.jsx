@@ -1,4 +1,4 @@
-import API_URL from "../api/api";
+import API_URL from "../../api/api";
 
 const BASE_URL = API_URL;
 
