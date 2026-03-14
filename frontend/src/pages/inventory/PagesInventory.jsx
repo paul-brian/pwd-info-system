@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import API_URL from "../api/api";
+import API_URL from "../../api/api";
 
 
 const API_BASE = `${API_URL}/api`;

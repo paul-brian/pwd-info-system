@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import API_URL from "../api/api";
+import API_URL from "../../api/api";
 import RecentLogs from "../../features/dashbord/RecentLogs";
 import { useNavigate } from "react-router-dom";
 import PWDActionModal from "../../features/dashbord/PwdAction";

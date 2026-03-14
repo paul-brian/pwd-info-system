@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import API_URL from "../api/api";
+import API_URL from "../../api/api";
 import Cards from "../../components/Cards";
 import Buttons from "../../components/Buttons";
 
