@@ -114,7 +114,7 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../../components/Navbars" // import mo existing navbar
+import Navbar from "../../components/ui/Navbars"
 
 const Login = () => {
   const navigate = useNavigate();

@@ -127,28 +127,28 @@ const ProfileSettings = () => {
 
   return (
     <div className="w-full">
-      <div className="mb-8">
-        <h1 className="text-3xl font-black text-slate-900 dark:text-white">Account Settings</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+      <div className="mb-4 sm:mb-6 md:mb-8">
+        <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white">Account Settings</h1>
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
           Manage your personal information and security preferences.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
 
         {/* LEFT: Profile Card */}
-        <div className="lg:col-span-1 flex flex-col gap-4">
+        <div className="lg:col-span-1 flex flex-col gap-2.5 sm:gap-3 md:gap-4">
 
           {/* Avatar Card */}
           <div className="relative bg-white dark:bg-slate-800/60 rounded-3xl border border-slate-200 dark:border-slate-700/50 overflow-hidden shadow-sm">
             <div className={`h-20 w-full bg-gradient-to-r ${roleBadge.color} opacity-90`} />
-            <div className="px-6 pb-6 -mt-10 flex flex-col items-center text-center">
+            <div className="px-3 sm:px-4 md:px-6 pb-4 sm:pb-5 md:pb-6 -mt-8 sm:-mt-9 md:-mt-10 flex flex-col items-center text-center">
               <div className="relative group mb-3">
-                <div className="w-20 h-20 rounded-2xl ring-4 ring-white dark:ring-slate-800 overflow-hidden bg-slate-200 dark:bg-slate-700 shadow-xl">
+                <div className="w-16 sm:w-18 md:w-20 h-16 sm:h-18 md:h-20 rounded-2xl ring-4 ring-white dark:ring-slate-800 overflow-hidden bg-slate-200 dark:bg-slate-700 shadow-xl">
                   {avatarUrl ? (
                     <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
                   ) : (
-                    <div className={`w-full h-full flex items-center justify-center bg-gradient-to-br ${roleBadge.color} text-white text-2xl font-black`}>
+                    <div className={`w-full h-full flex items-center justify-center bg-gradient-to-br ${roleBadge.color} text-white text-lg sm:text-xl md:text-2xl font-black`}>
                       {initials}
                     </div>
                   )}
@@ -157,45 +157,45 @@ const ProfileSettings = () => {
                   onClick={() => fileInputRef.current?.click()}
                   className="absolute inset-0 rounded-2xl bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
                 >
-                  <span className="material-symbols-outlined text-white text-xl">photo_camera</span>
+                  <span className="material-symbols-outlined text-white text-base sm:text-lg md:text-xl">photo_camera</span>
                 </button>
                 <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
               </div>
 
-              <h2 className="text-lg font-black text-slate-900 dark:text-white leading-tight">{profile?.full_name}</h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 break-all">{profile?.email}</p>
+              <h2 className="text-base sm:text-lg md:text-xl font-black text-slate-900 dark:text-white leading-tight">{profile?.full_name}</h2>
+              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 break-all">{profile?.email}</p>
 
-              <div className={`mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r ${roleBadge.color} text-white text-xs font-bold shadow-md`}>
-                <span className="material-symbols-outlined text-sm">{roleBadge.icon}</span>
+              <div className={`mt-2 sm:mt-3 md:mt-4 inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-gradient-to-r ${roleBadge.color} text-white text-[11px] sm:text-xs font-bold shadow-md`}>
+                <span className="material-symbols-outlined text-xs sm:text-sm">{roleBadge.icon}</span>
                 {profile?.role}
               </div>
 
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="mt-5 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 text-sm font-semibold hover:border-primary hover:text-primary transition-all"
+                className="mt-3 sm:mt-4 w-full flex items-center justify-center gap-2 py-2 sm:py-2.5 md:py-3 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-semibold hover:border-primary hover:text-primary transition-all"
               >
-                <span className="material-symbols-outlined text-base">upload</span>
+                <span className="material-symbols-outlined text-sm md:text-base">upload</span>
                 Change Photo
               </button>
             </div>
           </div>
 
           {/* Account Info */}
-          <div className="bg-white dark:bg-slate-800/60 rounded-3xl border border-slate-200 dark:border-slate-700/50 p-5 shadow-sm space-y-3">
-            <p className="text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">Account Info</p>
+          <div className="bg-white dark:bg-slate-800/60 rounded-3xl border border-slate-200 dark:border-slate-700/50 p-3 sm:p-4 md:p-5 shadow-sm space-y-2 sm:space-y-2.5 md:space-y-3">
+            <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1 sm:mb-2">Account Info</p>
             {[
               { icon: "person_outline", label: "Full Name", value: profile?.full_name },
               { icon: "mail", label: "Email", value: profile?.email },
               { icon: "manage_accounts", label: "Role", value: profile?.role },
               { icon: "verified_user", label: "Status", value: "Active" },
             ].map((item) => (
-              <div key={item.label} className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700/50 flex items-center justify-center flex-shrink-0">
-                  <span className="material-symbols-outlined text-slate-500 dark:text-slate-400 text-base">{item.icon}</span>
+              <div key={item.label} className="flex items-start gap-2 sm:gap-3">
+                <div className="w-7 sm:w-8 h-7 sm:h-8 rounded-lg bg-slate-100 dark:bg-slate-700/50 flex items-center justify-center flex-shrink-0">
+                  <span className="material-symbols-outlined text-slate-500 dark:text-slate-400 text-sm md:text-base">{item.icon}</span>
                 </div>
                 <div>
-                  <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wide">{item.label}</p>
-                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 break-all">{item.value}</p>
+                  <p className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wide">{item.label}</p>
+                  <p className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 break-all">{item.value}</p>
                 </div>
               </div>
             ))}
@@ -210,14 +210,14 @@ const ProfileSettings = () => {
               <button
                 key={item.key}
                 onClick={() => setActiveSection(item.key)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${
+                className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
                   activeSection === item.key
                     ? "bg-gradient-to-r from-primary/10 to-primary/5 text-primary"
                     : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/40"
                 }`}
               >
-                <span className="material-symbols-outlined text-lg">{item.icon}</span>
-                {item.label}
+                <span className="material-symbols-outlined text-base md:text-lg">{item.icon}</span>
+                <span className="hidden sm:inline">{item.label}</span>
               </button>
             ))}
           </div>
@@ -229,53 +229,53 @@ const ProfileSettings = () => {
           {/* Edit Profile */}
           {activeSection === "profile" && (
             <div className="bg-white dark:bg-slate-800/60 rounded-3xl border border-slate-200 dark:border-slate-700/50 shadow-sm overflow-hidden">
-              <div className="px-8 py-6 border-b border-slate-100 dark:border-slate-700/50 bg-gradient-to-r from-slate-50 to-transparent dark:from-slate-700/20 dark:to-transparent">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-primary text-xl">person_edit</span>
+              <div className="px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-5 md:py-6 border-b border-slate-100 dark:border-slate-700/50 bg-gradient-to-r from-slate-50 to-transparent dark:from-slate-700/20 dark:to-transparent">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="w-9 sm:w-10 h-9 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-primary text-lg md:text-xl">person_edit</span>
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-slate-900 dark:text-white">Edit Profile</h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Update your display name and email address.</p>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">Edit Profile</h3>
+                    <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">Update your display name and email address.</p>
                   </div>
                 </div>
               </div>
-              <div className="p-8 space-y-6">
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">Full Name</label>
+              <div className="p-3 sm:p-4 md:p-6 lg:p-8 space-y-4 sm:space-y-5 md:space-y-6">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <label className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">Full Name</label>
                   <div className="relative">
                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">person</span>
                     <input
                       type="text"
                       value={editForm.full_name}
                       onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
-                      className="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-slate-400"
+                      className="w-full pl-11 sm:pl-12 pr-4 py-2.5 sm:py-3 md:py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-slate-400"
                       placeholder="Enter your full name"
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">Email Address</label>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <label className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">Email Address</label>
                   <div className="relative">
                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">mail</span>
                     <input
                       type="email"
                       value={editForm.email}
                       onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                      className="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-slate-400"
+                      className="w-full pl-11 sm:pl-12 pr-4 py-2.5 sm:py-3 md:py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-slate-400"
                       placeholder="Enter your email"
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">Role</label>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <label className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">Role</label>
                   <div className="relative">
                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">manage_accounts</span>
                     <input
                       type="text"
                       value={profile?.role || ""}
                       disabled
-                      className="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 text-sm font-medium cursor-not-allowed"
+                      className="w-full pl-11 sm:pl-12 pr-4 py-2.5 sm:py-3 md:py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 text-xs sm:text-sm font-medium cursor-not-allowed"
                     />
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400 dark:text-slate-500 font-semibold">Read-only</span>
                   </div>
@@ -284,9 +284,9 @@ const ProfileSettings = () => {
                   <button
                     onClick={handleUpdateProfile}
                     disabled={saving}
-                    className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/80 text-white rounded-2xl text-sm font-bold shadow-lg shadow-primary/20 transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-3.5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/80 text-white rounded-2xl text-xs sm:text-sm font-bold shadow-lg shadow-primary/20 transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    {saving ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <span className="material-symbols-outlined text-lg">save</span>}
+                    {saving ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <span className="material-symbols-outlined text-base md:text-lg">save</span>}
                     {saving ? "Saving..." : "Save Changes"}
                   </button>
                 </div>
@@ -297,22 +297,22 @@ const ProfileSettings = () => {
           {/* Change Password */}
           {activeSection === "password" && (
             <div className="bg-white dark:bg-slate-800/60 rounded-3xl border border-slate-200 dark:border-slate-700/50 shadow-sm overflow-hidden">
-              <div className="px-8 py-6 border-b border-slate-100 dark:border-slate-700/50 bg-gradient-to-r from-slate-50 to-transparent dark:from-slate-700/20 dark:to-transparent">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-amber-500 text-xl">lock_reset</span>
+              <div className="px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-5 md:py-6 border-b border-slate-100 dark:border-slate-700/50 bg-gradient-to-r from-slate-50 to-transparent dark:from-slate-700/20 dark:to-transparent">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="w-9 sm:w-10 h-9 sm:h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-amber-500 text-lg md:text-xl">lock_reset</span>
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-slate-900 dark:text-white">Change Password</h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Keep your account secure with a strong password.</p>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">Change Password</h3>
+                    <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">Keep your account secure with a strong password.</p>
                   </div>
                 </div>
               </div>
-              <div className="p-8 space-y-6">
-                <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-700/30">
-                  <div className="flex items-start gap-3">
-                    <span className="material-symbols-outlined text-amber-500 text-lg mt-0.5">info</span>
-                    <div className="space-y-1 text-xs text-amber-800 dark:text-amber-300">
+              <div className="p-3 sm:p-4 md:p-6 lg:p-8 space-y-4 sm:space-y-5 md:space-y-6">
+                <div className="p-3 sm:p-4 rounded-2xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-700/30">
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <span className="material-symbols-outlined text-amber-500 text-lg md:text-xl mt-0.5 flex-shrink-0">info</span>
+                    <div className="space-y-1 text-xs sm:text-sm text-amber-800 dark:text-amber-300">
                       <p className="font-bold">Password Requirements</p>
                       <p>• At least 6 characters long</p>
                       <p>• Use a mix of letters, numbers, and symbols for better security</p>
@@ -324,40 +324,40 @@ const ProfileSettings = () => {
                   { key: "new", field: "newPassword", label: "New Password", icon: "lock_open", placeholder: "Enter new password" },
                   { key: "confirm", field: "confirmPassword", label: "Confirm New Password", icon: "lock_clock", placeholder: "Re-enter new password" },
                 ].map((item) => (
-                  <div key={item.key} className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">{item.label}</label>
+                  <div key={item.key} className="space-y-1.5 sm:space-y-2">
+                    <label className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">{item.label}</label>
                     <div className="relative">
                       <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">{item.icon}</span>
                       <input
                         type={showPw[item.key] ? "text" : "password"}
                         value={pwForm[item.field]}
                         onChange={(e) => setPwForm({ ...pwForm, [item.field]: e.target.value })}
-                        className="w-full pl-12 pr-12 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-slate-400"
+                        className="w-full pl-11 sm:pl-12 pr-11 sm:pr-12 py-2.5 sm:py-3 md:py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-slate-400"
                         placeholder={item.placeholder}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPw((p) => ({ ...p, [item.key]: !p[item.key] }))}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors text-xs sm:text-sm"
                       >
-                        <span className="material-symbols-outlined text-xl">{showPw[item.key] ? "visibility_off" : "visibility"}</span>
+                        <span className="material-symbols-outlined text-base">{showPw[item.key] ? "visibility_off" : "visibility"}</span>
                       </button>
                     </div>
                     {item.key === "confirm" && pwForm.confirmPassword && (
-                      <p className={`text-xs font-semibold flex items-center gap-1 ${pwForm.newPassword === pwForm.confirmPassword ? "text-emerald-500" : "text-red-500"}`}>
-                        <span className="material-symbols-outlined text-sm">{pwForm.newPassword === pwForm.confirmPassword ? "check_circle" : "cancel"}</span>
+                      <p className={`text-xs sm:text-sm font-semibold flex items-center gap-1 ${pwForm.newPassword === pwForm.confirmPassword ? "text-emerald-500" : "text-red-500"}`}>
+                        <span className="material-symbols-outlined text-xs sm:text-sm">{pwForm.newPassword === pwForm.confirmPassword ? "check_circle" : "cancel"}</span>
                         {pwForm.newPassword === pwForm.confirmPassword ? "Passwords match" : "Passwords don't match"}
                       </p>
                     )}
                   </div>
                 ))}
-                <div className="pt-2 flex justify-end">
+                <div className="flex justify-end pt-2 border-t border-slate-100 dark:border-slate-800">
                   <button
                     onClick={handleChangePassword}
                     disabled={saving}
-                    className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-2xl text-sm font-bold shadow-lg shadow-amber-500/20 transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-2xl text-xs sm:text-sm font-bold shadow-lg shadow-amber-500/20 transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    {saving ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <span className="material-symbols-outlined text-lg">lock_reset</span>}
+                    {saving ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <span className="material-symbols-outlined text-base md:text-lg">lock_reset</span>}
                     {saving ? "Updating..." : "Update Password"}
                   </button>
                 </div>

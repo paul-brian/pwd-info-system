@@ -48,22 +48,24 @@ const EventAttendance = () => {
   }, []);
 
   return (
-    <main className="flex-1 flex flex-col overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+    <main className="flex-1 flex flex-col overflow-y-auto px-3 sm:px-4 md:px-8 py-4 sm:py-6 md:py-8 space-y-4 sm:space-y-6">
       {/* Header */}
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">My Event Attendance</h2>
-        <button className="flex items-center gap-2 bg-slate-200 dark:bg-slate-800 px-4 py-2 rounded-lg font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-all text-sm sm:text-base">
-          <span className="material-symbols-outlined">archive</span> View Archive
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+        <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white">My Event Attendance</h2>
+        <button className="flex items-center gap-2 bg-slate-200 dark:bg-slate-800 px-3 sm:px-4 py-2.5 sm:py-2 md:py-3 rounded-lg font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-all text-xs sm:text-sm md:text-base h-10 sm:h-11 md:h-12 touch-target whitespace-nowrap">
+          <span className="material-symbols-outlined text-sm md:text-base">archive</span>
+          <span className="hidden sm:inline">View Archive</span>
+          <span className="sm:hidden">Archive</span>
         </button>
       </header>
 
       {/* Tabs */}
-      <div className="flex gap-4 mb-4 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
+      <div className="flex gap-2 sm:gap-4 mb-4 sm:mb-6 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
         {["All", "Upcoming", "History"].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`pb-2 text-sm sm:text-base font-bold whitespace-nowrap ${
+            className={`pb-2 text-xs sm:text-sm md:text-base font-bold whitespace-nowrap ${
               activeTab === tab ? "border-b-2 border-primary text-primary" : "text-slate-500 dark:text-slate-400 hover:text-primary transition-colors"
             }`}
           >
@@ -73,15 +75,15 @@ const EventAttendance = () => {
       </div>
 
       {/* Search */}
-      <div className="mb-4 max-w-md">
+      <div className="mb-4 sm:mb-6 w-full sm:max-w-md">
         <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 material-symbols-outlined">search</span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 material-symbols-outlined text-base md:text-lg">search</span>
           <input
             type="text"
-            placeholder="Search event name or venue..."
+            placeholder="Search event..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm sm:text-base focus:ring-2 focus:ring-primary transition-all"
+            className="w-full pl-10 pr-4 py-2.5 sm:py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs sm:text-sm md:text-base focus:ring-2 focus:ring-primary transition-all"
           />
         </div>
       </div>
@@ -91,23 +93,23 @@ const EventAttendance = () => {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 dark:bg-slate-800/50">
-              <th className="px-4 py-3 text-sm sm:text-base font-bold text-slate-900 dark:text-white">Event Name</th>
-              <th className="px-4 py-3 text-sm sm:text-base font-bold text-slate-900 dark:text-white">Date</th>
-              <th className="px-4 py-3 text-sm sm:text-base font-bold text-slate-900 dark:text-white">Venue</th>
-              <th className="px-4 py-3 text-sm sm:text-base font-bold text-slate-900 dark:text-white w-48 text-center">My Status</th>
+              <th className="px-3 md:px-4 lg:px-6 py-3 text-[10px] md:text-xs lg:text-sm font-bold text-slate-900 dark:text-white">Event Name</th>
+              <th className="px-3 md:px-4 lg:px-6 py-3 text-[10px] md:text-xs lg:text-sm font-bold text-slate-900 dark:text-white">Date</th>
+              <th className="px-3 md:px-4 lg:px-6 py-3 text-[10px] md:text-xs lg:text-sm font-bold text-slate-900 dark:text-white">Venue</th>
+              <th className="px-3 md:px-4 lg:px-6 py-3 text-[10px] md:text-xs lg:text-sm font-bold text-slate-900 dark:text-white text-center">My Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
             {filteredEvents.map((event, i) => (
               <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                <td className="px-4 py-3 text-sm sm:text-base font-medium text-slate-900 dark:text-white">{event.name}</td>
-                <td className="px-4 py-3 text-sm sm:text-base text-slate-600 dark:text-slate-400">{event.date}</td>
-                <td className="px-4 py-3 text-sm sm:text-base text-slate-600 dark:text-slate-400">{event.venue}</td>
-                <td className="px-4 py-3 text-center">
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs sm:text-sm font-bold ${statusColors[event.status]}`}>
-                    {event.status === "Attended" && <span className="material-symbols-outlined text-xs sm:text-sm mr-1">check_circle</span>}
-                    {event.status === "Registered" && <span className="material-symbols-outlined text-xs sm:text-sm mr-1">app_registration</span>}
-                    {event.status === "Absent" && <span className="material-symbols-outlined text-xs sm:text-sm mr-1">cancel</span>}
+                <td className="px-3 md:px-4 lg:px-6 py-3 text-[9px] md:text-xs lg:text-sm font-medium text-slate-900 dark:text-white">{event.name}</td>
+                <td className="px-3 md:px-4 lg:px-6 py-3 text-[9px] md:text-xs lg:text-sm text-slate-600 dark:text-slate-400">{event.date}</td>
+                <td className="px-3 md:px-4 lg:px-6 py-3 text-[9px] md:text-xs lg:text-sm text-slate-600 dark:text-slate-400">{event.venue}</td>
+                <td className="px-3 md:px-4 lg:px-6 py-3 text-center">
+                  <span className={`inline-flex items-center px-2.5 md:px-3 py-1 rounded-full text-[8px] md:text-xs lg:text-sm font-bold ${statusColors[event.status]}`}>
+                    {event.status === "Attended" && <span className="material-symbols-outlined text-[10px] md:text-xs mr-1">check_circle</span>}
+                    {event.status === "Registered" && <span className="material-symbols-outlined text-[10px] md:text-xs mr-1">app_registration</span>}
+                    {event.status === "Absent" && <span className="material-symbols-outlined text-[10px] md:text-xs mr-1">cancel</span>}
                     {event.status}
                   </span>
                 </td>
@@ -118,9 +120,9 @@ const EventAttendance = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
         {["Attended", "Registered", "Missed"].map((key) => (
-          <div key={key} className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4">
+          <div key={key} className="bg-white dark:bg-slate-900 p-3 sm:p-4 md:p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3 sm:gap-4">
             <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 text-2xl">
               <span className="material-symbols-outlined">
                 {key === "Attended" ? "how_to_reg" : key === "Registered" ? "pending_actions" : "event_busy"}

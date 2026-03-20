@@ -1,232 +1,21 @@
-// import { useState } from "react";
-
-// const dummyRecords = [
-//   { id: "PWD-001", name: "Juan Dela Cruz", zone: "Zone 4, Trapiche", date: "2023-10-24", status: "Stable", color: "green", vitals: "120/80 - 65kg", staff: "Nurse Sarah", staffImg: "https://lh3.googleusercontent.com/aida-public/AB6AXuDtp544j9UiOJ2op8gpC0OoPrr76LLXpXyvqyE9LzPrwteTMY2kpx-bDmUBML-HKOTWqvf1wf7nadip64A_PhsB2khmEsmMyY42yUdtpLo9JgQ07U8STDSXdt6DfXRtPttrd2nzDDkIj3oC14TqQG-DWfE3ESe3yT6iSLwR_l3aEytE818TlM5SSNPvpfbDHl0r9-cf4z8T5NQcNpi056E-IX3epeJ7IDq4jQtbWSEVJ9tFtIf7Ak39V-xLX1KkIW8C_G-ZJbsI3fE" },
-//   { id: "PWD-002", name: "Maria Santos", zone: "Zone 1, Trapiche", date: "2023-10-22", status: "Follow-up", color: "amber", vitals: "140/90 - 58kg", staff: "Dr. Reyes", staffImg: "https://lh3.googleusercontent.com/aida-public/AB6AXuA7t5nigaJTn5fSjPQ97WTCtv2SnePcJgGX6ryU66Drxr1nulphcnP8OVS6K8R_If3S0_j3I7VejhFpt2M1vy11dLhNw5o76bSHGeHPuxbrGlJA1Kjk6AOQ3omPTS--52Sv2I-Lu_6LMlKWZy6ndUJ2L-HLcHmM1jVNSEHX53-fWnOEbh7C9ukLor53fWpeBlZMYDWaxABAiYuP7Ifj_B5oLMTFsgXynyhnZ8qmh1qnK1VMaXdhAd-JsATsl5w7lhmxvpMpYMp7gBs" },
-//   { id: "PWD-003", name: "Ricardo Gomez", zone: "Zone 3, Trapiche", date: "2023-10-21", status: "Critical", color: "red", vitals: "160/100 - 72kg", staff: "Nurse Sarah", staffImg: "https://lh3.googleusercontent.com/aida-public/AB6AXuB8aX7mrHSlb7KCkZM2oHhPUj-VOCQ2jD76TIgtw0FR3vcRqR6dLVg5Zxfxod-8IsNAVAv7AEEXwZdOAo1Ot60J69KNtG_CJ2ETJApgcsGJNYLqk3s48d4EyPyD9NPCbgXQQI0AdAch_RXTa9D3GM4Lx2BCREJgALs3x6MwPMEGu_pIMuND14odCU3yYBixPgMDt5U9ON1UO07Jy_kQyRv3V9yJYgSkBgNhoNOsw25YiPKa1VIv5vYBnDkzyOBYKaaT5IX6c_0e0os" },
-//   { id: "PWD-004", name: "Elena Dimaculangan", zone: "Zone 2, Trapiche", date: "2023-10-20", status: "Stable", color: "green", vitals: "110/70 - 50kg", staff: "Dr. Reyes", staffImg: "https://lh3.googleusercontent.com/aida-public/AB6AXuDNNaY6RrxDt3AwwdnEQ12PdG6ESHXNwXG1ggudPfYxE9bMRzcde5n-t22n2hOkndBrnkVYoIPG-TchVJTH3zz_gzFuYhsrsTIpi3ROZjmkNzGg4MhXPoQeFXtKz6-zi8eHOlmVVJg9SFkdTJJzIk6POvVM80g2QH2Cd95d2dSm7h3DymjbycCkhfsm72FMoCFA3rxo_g69sM-ZDnnVjOuDSD9mJtuwJvPAh-QRGeq7lcjbTCyr96159No5Vpl8eKhh8k2GenNkMSY" },
-// ];
-
-// const AdminHealthRecords = () => {
-//   const [records, setRecords] = useState(dummyRecords);
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [modal, setModal] = useState({ type: null, record: null });
-//   const itemsPerPage = 3;
-
-//   const paginatedRecords = records.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-//   const totalPages = Math.ceil(records.length / itemsPerPage);
-
-//   const statusColors = {
-//     green: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-//     amber: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-//     red: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-//   };
-
-//   const goToPage = (page) => {
-//     if (page < 1 || page > totalPages) return;
-//     setCurrentPage(page);
-//   };
-
-//   // ---------- Dynamic Stats ----------
-//   const today = new Date();
-//   const oneWeekAgo = new Date();
-//   oneWeekAgo.setDate(today.getDate() - 7);
-
-//   const criticalCases = records.filter(r => r.status === "Critical").length;
-//   const checkupsThisWeek = records.filter(r => {
-//     const recordDate = new Date(r.date);
-//     return recordDate >= oneWeekAgo && recordDate <= today;
-//   }).length;
-
-//   const staffSet = new Set(records.map(r => r.staff));
-//   const activeStaffSet = new Set(records.filter(r => {
-//     const recordDate = new Date(r.date);
-//     return recordDate >= oneWeekAgo && recordDate <= today;
-//   }).map(r => r.staff));
-//   const staffUtilization = staffSet.size ? Math.round((activeStaffSet.size / staffSet.size) * 100) : 0;
-
-//   // ---------- Modal Handlers ----------
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     const form = e.target;
-//     const newRecord = {
-//       id: form.id.value,
-//       name: form.name.value,
-//       zone: form.zone.value,
-//       date: form.date.value,
-//       status: form.status.value,
-//       color: form.status.value === "Critical" ? "red" : form.status.value === "Follow-up" ? "amber" : "green",
-//       vitals: form.vitals.value,
-//       staff: form.staff.value,
-//       staffImg: form.staffImg.value
-//     };
-
-//     if (modal.type === "add") {
-//       setRecords([newRecord, ...records]);
-//     } else if (modal.type === "edit") {
-//       setRecords(records.map(r => r.id === modal.record.id ? newRecord : r));
-//     }
-
-//     setModal({ type: null, record: null });
-//   };
-
-//   const handleDelete = () => {
-//     setRecords(records.filter(r => r.id !== modal.record.id));
-//     setModal({ type: null, record: null });
-//   };
-
-//   return (
-//     <div className="p-4 md:p-8 max-w-7xl mx-auto flex flex-col gap-8">
-//       {/* Heading + Add Button */}
-//       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
-//         <div className="flex flex-col gap-1">
-//           <h1 className="text-[#0e141b] dark:text-white text-2xl md:text-3xl font-black leading-tight tracking-tight">Health Monitoring</h1>
-//           <p className="text-[#4e7397] dark:text-slate-400 text-sm md:text-base">Manage and monitor PWD health records across the barangay</p>
-//         </div>
-//         <button onClick={() => setModal({ type: "add", record: null })} className="flex items-center gap-2 px-4 md:px-6 py-2 bg-primary text-white rounded-lg text-sm md:text-base font-bold shadow-md hover:bg-blue-600 transition-colors whitespace-nowrap">
-//           <span className="material-symbols-outlined text-sm md:text-base">add</span>
-//           Record New Checkup
-//         </button>
-//       </div>
-
-//       {/* Table */}
-//       <div className="bg-white dark:bg-slate-900 border border-[#d0dbe7] dark:border-slate-800 rounded-xl overflow-x-auto shadow-sm">
-//         <table className="w-full min-w-[700px] text-left border-collapse">
-//           <thead className="bg-slate-50 dark:bg-slate-800/50">
-//             <tr>
-//               {["PWD ID", "Name", "Last Checkup Date", "Health Status", "Vitals (BP/Weight)", "Attending Staff", "Actions"].map((col, idx) => (
-//                 <th key={idx} className="px-4 md:px-6 py-3 text-xs md:text-sm font-bold text-[#4e7397] dark:text-slate-400 uppercase tracking-wider">{col}</th>
-//               ))}
-//             </tr>
-//           </thead>
-//           <tbody className="divide-y divide-[#d0dbe7] dark:divide-slate-800">
-//             {paginatedRecords.map(record => (
-//               <tr key={record.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
-//                 <td className="px-4 md:px-6 py-3 text-sm font-medium text-primary">{record.id}</td>
-//                 <td className="px-4 md:px-6 py-3">
-//                   <div className="flex flex-col">
-//                     <span className="text-sm font-bold dark:text-white">{record.name}</span>
-//                     <span className="text-xs text-[#4e7397]">{record.zone}</span>
-//                   </div>
-//                 </td>
-//                 <td className="px-4 md:px-6 py-3 text-sm text-[#4e7397] dark:text-slate-400">{record.date}</td>
-//                 <td className="px-4 md:px-6 py-3">
-//                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${statusColors[record.color]}`}>{record.status}</span>
-//                 </td>
-//                 <td className="px-4 md:px-6 py-3 text-sm text-[#4e7397] dark:text-slate-400">{record.vitals}</td>
-//                 <td className="px-4 md:px-6 py-3">
-//                   <div className="flex items-center gap-2">
-//                     <div className="w-6 h-6 rounded-full bg-slate-200 bg-cover bg-center" style={{ backgroundImage: `url(${record.staffImg})` }} title={record.staff}></div>
-//                     <span className="text-sm font-medium dark:text-slate-300">{record.staff}</span>
-//                   </div>
-//                 </td>
-//                 <td className="px-4 md:px-6 py-3 text-right">
-//                   <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-//                     <button onClick={() => setModal({ type: "edit", record })} className="p-2 hover:bg-primary/10 hover:text-primary rounded-lg transition-colors text-[#4e7397]">
-//                       <span className="material-symbols-outlined text-xl">edit</span>
-//                     </button>
-//                     <button onClick={() => setModal({ type: "delete", record })} className="p-2 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-[#4e7397]">
-//                       <span className="material-symbols-outlined text-xl">delete</span>
-//                     </button>
-//                   </div>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-
-//         {/* Pagination */}
-//         <div className="px-4 md:px-6 py-4 bg-slate-50 dark:bg-slate-800/50 flex flex-wrap items-center justify-between border-t border-[#d0dbe7] dark:border-slate-800 gap-2">
-//           <p className="text-sm text-[#4e7397] dark:text-slate-400">
-//             Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, records.length)} of {records.length} records
-//           </p>
-//           <div className="flex gap-2 flex-wrap">
-//             <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1} className="px-3 py-1 border border-[#d0dbe7] dark:border-slate-700 rounded-lg text-sm font-medium disabled:opacity-50 hover:bg-white dark:hover:bg-slate-800 transition-colors">Previous</button>
-//             {Array.from({ length: totalPages }, (_, i) => (
-//               <button key={i + 1} onClick={() => goToPage(i + 1)} className={`px-3 py-1 rounded-lg text-sm font-medium ${currentPage === i + 1 ? "bg-primary text-white" : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 border border-[#d0dbe7] dark:border-slate-700"}`}>{i + 1}</button>
-//             ))}
-//             <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages} className="px-3 py-1 border border-[#d0dbe7] dark:border-slate-700 rounded-lg text-sm font-medium disabled:opacity-50 hover:bg-white dark:hover:bg-slate-800 transition-colors">Next</button>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Footer Stats */}
-//       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6">
-//         <div className="p-4 bg-white dark:bg-slate-900 border border-[#d0dbe7] dark:border-slate-800 rounded-xl">
-//           <p className="text-xs font-bold text-[#4e7397] dark:text-slate-400 uppercase tracking-widest mb-1">Critical Cases</p>
-//           <p className="text-2xl font-black text-red-600">{criticalCases}</p>
-//         </div>
-//         <div className="p-4 bg-white dark:bg-slate-900 border border-[#d0dbe7] dark:border-slate-800 rounded-xl">
-//           <p className="text-xs font-bold text-[#4e7397] dark:text-slate-400 uppercase tracking-widest mb-1">Checkups This Week</p>
-//           <p className="text-2xl font-black text-primary">{checkupsThisWeek}</p>
-//         </div>
-//         <div className="p-4 bg-white dark:bg-slate-900 border border-[#d0dbe7] dark:border-slate-800 rounded-xl">
-//           <p className="text-xs font-bold text-[#4e7397] dark:text-slate-400 uppercase tracking-widest mb-1">Staff Utilization</p>
-//           <p className="text-2xl font-black text-green-600">{staffUtilization}%</p>
-//         </div>
-//       </div>
-
-//       {/* ---------- Modal ---------- */}
-//       {modal.type && (
-//         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-//           <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl max-w-md w-full p-6">
-//             <div className="flex justify-between items-center mb-4">
-//               <h2 className="text-xl font-bold">
-//                 {modal.type === "add" ? "Add Record" : modal.type === "edit" ? "Edit Record" : "Delete Record"}
-//               </h2>
-//               <button onClick={() => setModal({ type: null, record: null })} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-//                 <span className="material-symbols-outlined">close</span>
-//               </button>
-//             </div>
-
-//             {modal.type === "delete" ? (
-//               <div className="flex flex-col gap-4">
-//                 <p>Are you sure you want to delete <span className="font-bold">{modal.record.name}</span>?</p>
-//                 <div className="flex justify-end gap-2">
-//                   <button onClick={() => setModal({ type: null, record: null })} className="px-4 py-2 border rounded-lg">Cancel</button>
-//                   <button onClick={handleDelete} className="px-4 py-2 bg-red-500 text-white rounded-lg">Delete</button>
-//                 </div>
-//               </div>
-//             ) : (
-//               <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-//                 <input name="id" placeholder="PWD ID" defaultValue={modal.record?.id || ""} required className="border rounded-lg px-3 py-2" />
-//                 <input name="name" placeholder="Name" defaultValue={modal.record?.name || ""} required className="border rounded-lg px-3 py-2" />
-//                 <input name="zone" placeholder="Zone" defaultValue={modal.record?.zone || ""} required className="border rounded-lg px-3 py-2" />
-//                 <input name="date" type="date" defaultValue={modal.record?.date || ""} required className="border rounded-lg px-3 py-2" />
-//                 <select name="status" defaultValue={modal.record?.status || "Stable"} className="border rounded-lg px-3 py-2">
-//                   <option value="Stable">Stable</option>
-//                   <option value="Follow-up">Follow-up</option>
-//                   <option value="Critical">Critical</option>
-//                 </select>
-//                 <input name="vitals" placeholder="Vitals (BP/Weight)" defaultValue={modal.record?.vitals || ""} required className="border rounded-lg px-3 py-2" />
-//                 <input name="staff" placeholder="Attending Staff" defaultValue={modal.record?.staff || ""} required className="border rounded-lg px-3 py-2" />
-//                 <input name="staffImg" placeholder="Staff Image URL" defaultValue={modal.record?.staffImg || ""} required className="border rounded-lg px-3 py-2" />
-//                 <div className="flex justify-end gap-2 mt-4">
-//                   <button type="button" onClick={() => setModal({ type: null, record: null })} className="px-4 py-2 border rounded-lg">Cancel</button>
-//                   <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg">{modal.type === "add" ? "Add" : "Update"}</button>
-//                 </div>
-//               </form>
-//             )}
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default AdminHealthRecords;
-
 import { useState, useEffect } from "react";
 import API_URL from "../../api/api";
 import axios from "axios";
+import StatsCards from "../../components/ui/StatsCards";
+import StatsGrid from "../../components/ui/StatsGrid";
+import DataTable from "../../components/ui/DataTable";
+import Pagination from "../../components/ui/Pagination";
+import SearchBar from "../../components/ui/SearchBar";
+import AddEditModal from "../../components/modals/AddEditModal";
+import DeleteModal from "../../components/modals/DeleteModal";
+import ViewModal from "../../components/modals/ViewModal";
 
 const API_BASE = `${API_URL}/api/health`;
 
-// Helper to map DB row → display format
 const mapRecord = (r) => ({
   id: r.health_id,
   pwd_id: r.pwd_id,
-  name: r.name || `PWD-${r.pwd_id}`,           // join pwd_profiles if available
+  name: r.name || `PWD-${r.pwd_id}`,
   zone: r.zone || "—",
   date: r.recorded_at ? r.recorded_at.slice(0, 10) : "—",
   status: r.health_status,
@@ -234,7 +23,6 @@ const mapRecord = (r) => ({
        : r.health_status === "Follow-up" ? "amber"
        : "green",
   vitals: `${r.blood_pressure} - ${r.weight}kg`,
-  // raw fields for edit form
   blood_pressure: r.blood_pressure,
   heart_rate: r.heart_rate,
   temperature: r.temperature,
@@ -246,6 +34,12 @@ const mapRecord = (r) => ({
   staffImg: r.staffImg || "",
 });
 
+const statusColors = {
+  green: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+  amber: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+  red:   "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+};
+
 const AdminHealthRecords = () => {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -253,9 +47,10 @@ const AdminHealthRecords = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [modal, setModal] = useState({ type: null, record: null });
   const [submitting, setSubmitting] = useState(false);
-  const itemsPerPage = 3;
+  const [search, setSearch] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const itemsPerPage = 8;
 
-  // ── FETCH ALL ──────────────────────────────────────────────
   const fetchRecords = async () => {
     setLoading(true);
     setError(null);
@@ -271,60 +66,44 @@ const AdminHealthRecords = () => {
 
   useEffect(() => { fetchRecords(); }, []);
 
-  // ── PAGINATION ─────────────────────────────────────────────
-  const paginatedRecords = records.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-  const totalPages = Math.ceil(records.length / itemsPerPage);
-  const goToPage = (page) => {
-    if (page < 1 || page > totalPages) return;
-    setCurrentPage(page);
-  };
+  const closeModal = () => setModal({ type: null, record: null });
 
-  // ── STATUS COLORS ──────────────────────────────────────────
-  const statusColors = {
-    green: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-    amber: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-    red:   "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-  };
+  // ── Filter & Paginate ──
+  const filtered = records.filter(r => {
+    const matchStatus = filterStatus === "all" || r.status?.toLowerCase() === filterStatus.toLowerCase();
+    const matchSearch =
+      String(r.pwd_id).includes(search) ||
+      (r.name || "").toLowerCase().includes(search.toLowerCase()) ||
+      (r.status || "").toLowerCase().includes(search.toLowerCase()) ||
+      (r.remarks || "").toLowerCase().includes(search.toLowerCase());
+    return matchStatus && matchSearch;
+  });
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const paginatedRecords = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const goToPage = (page) => { if (page < 1 || page > totalPages) return; setCurrentPage(page); };
 
-  // ── STATS ──────────────────────────────────────────────────
+  // ── Stats ──
   const today = new Date();
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(today.getDate() - 7);
-
   const criticalCases = records.filter(r => r.status === "Critical").length;
-  const checkupsThisWeek = records.filter(r => {
-    const d = new Date(r.date);
-    return d >= oneWeekAgo && d <= today;
-  }).length;
+  const checkupsThisWeek = records.filter(r => { const d = new Date(r.date); return d >= oneWeekAgo && d <= today; }).length;
   const staffSet = new Set(records.map(r => r.staff));
-  const activeStaffSet = new Set(
-    records
-      .filter(r => { const d = new Date(r.date); return d >= oneWeekAgo && d <= today; })
-      .map(r => r.staff)
-  );
-  const staffUtilization = staffSet.size
-    ? Math.round((activeStaffSet.size / staffSet.size) * 100)
-    : 0;
+  const activeStaffSet = new Set(records.filter(r => { const d = new Date(r.date); return d >= oneWeekAgo && d <= today; }).map(r => r.staff));
+  const staffUtilization = staffSet.size ? Math.round((activeStaffSet.size / staffSet.size) * 100) : 0;
 
-  // ── CREATE ─────────────────────────────────────────────────
-  const handleCreate = async (body) => {
-    await axios.post(API_BASE, body);
-  };
+  const statsdata = [
+    { label: "Critical Cases",     icon: "emergency",      value: criticalCases,          change: "", changeText: "active critical cases", changeClass: "text-red-600" },
+    { label: "Checkups This Week", icon: "calendar_check", value: checkupsThisWeek,       change: "", changeText: "in the last 7 days",   changeClass: "text-primary" },
+    { label: "Staff Utilization",  icon: "people",         value: `${staffUtilization}%`, change: "", changeText: "of staff active",      changeClass: "text-green-600" },
+  ];
 
-  // ── UPDATE ─────────────────────────────────────────────────
-  const handleUpdate = async (id, body) => {
-    await axios.put(`${API_BASE}/${id}`, body);
-  };
-
-  // ── DELETE ─────────────────────────────────────────────────
+  // ── CRUD ──
   const handleDelete = async () => {
     setSubmitting(true);
     try {
       await axios.delete(`${API_BASE}/${modal.record.id}`);
-      setModal({ type: null, record: null });
+      closeModal();
       fetchRecords();
     } catch (err) {
       alert(err.response?.data?.message || err.message);
@@ -333,12 +112,10 @@ const AdminHealthRecords = () => {
     }
   };
 
-  // ── FORM SUBMIT (add / edit) ───────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     const form = e.target;
-
     const body = {
       pwd_id:         parseInt(form.pwd_id.value),
       blood_pressure: form.blood_pressure.value,
@@ -349,14 +126,10 @@ const AdminHealthRecords = () => {
       remarks:        form.remarks.value || null,
       health_status:  form.health_status.value,
     };
-
     try {
-      if (modal.type === "add") {
-        await handleCreate(body);
-      } else {
-        await handleUpdate(modal.record.id, body);
-      }
-      setModal({ type: null, record: null });
+      if (modal.type === "add") await axios.post(API_BASE, body);
+      else await axios.put(`${API_BASE}/${modal.record.id}`, body);
+      closeModal();
       fetchRecords();
     } catch (err) {
       alert(err.response?.data?.message || err.message);
@@ -365,228 +138,261 @@ const AdminHealthRecords = () => {
     }
   };
 
-  // ── RENDER ─────────────────────────────────────────────────
-  return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto flex flex-col gap-8">
+  // ── Desktop row ──
+  const renderRow = (record) => (
+    <tr key={record.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
+      <td className="px-4 lg:px-5 2xl:px-6 py-3 lg:py-4 text-sm font-medium text-primary">#{record.id}</td>
+      <td className="px-4 lg:px-5 2xl:px-6 py-3 lg:py-4 text-sm text-[#4e7397]">{record.pwd_id}</td>
+      <td className="px-4 lg:px-5 2xl:px-6 py-3 lg:py-4 text-sm font-mono">{record.blood_pressure}</td>
+      <td className="px-4 lg:px-5 2xl:px-6 py-3 lg:py-4 text-sm">{record.heart_rate} bpm</td>
+      <td className="px-4 lg:px-5 2xl:px-6 py-3 lg:py-4 text-sm">{record.weight} kg</td>
+      <td className="px-4 lg:px-5 2xl:px-6 py-3 lg:py-4 text-sm">{record.blood_sugar || "—"}</td>
+      <td className="px-4 lg:px-5 2xl:px-6 py-3 lg:py-4">
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${statusColors[record.color]}`}>
+          {record.status}
+        </span>
+      </td>
+      <td className="px-4 lg:px-5 2xl:px-6 py-3 lg:py-4 text-sm text-[#4e7397] max-w-[160px] truncate" title={record.remarks}>
+        {record.remarks || "—"}
+      </td>
+      <td className="px-4 lg:px-5 2xl:px-6 py-3 lg:py-4 text-sm text-[#4e7397] whitespace-nowrap">{record.date}</td>
+      <td className="px-4 lg:px-5 2xl:px-6 py-3 lg:py-4">
+        <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button onClick={() => setModal({ type: "view", record })}
+            className="p-1.5 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors text-[#4e7397]">
+            <span className="material-symbols-outlined text-lg lg:text-xl">visibility</span>
+          </button>
+          <button onClick={() => setModal({ type: "edit", record })}
+            className="p-1.5 hover:bg-primary/10 hover:text-primary rounded-lg transition-colors text-[#4e7397]">
+            <span className="material-symbols-outlined text-lg lg:text-xl">edit</span>
+          </button>
+          <button onClick={() => setModal({ type: "delete", record })}
+            className="p-1.5 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-[#4e7397]">
+            <span className="material-symbols-outlined text-lg lg:text-xl">delete</span>
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
 
-      {/* Heading */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-[#0e141b] dark:text-white text-2xl md:text-3xl font-black leading-tight tracking-tight">
+  // ── Mobile card ──
+  const renderCard = (record) => (
+    <div key={record.id} className="bg-white dark:bg-slate-900 rounded-xl border border-[#d0dbe7] dark:border-slate-800 p-3 sm:p-4 shadow-sm">
+      <div className="flex items-start justify-between gap-2 mb-2.5">
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-sm text-[#0e141b] dark:text-white">PWD #{record.pwd_id}</p>
+          <p className="text-xs text-[#4e7397] mt-0.5">{record.date}</p>
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${statusColors[record.color]}`}>
+            {record.status}
+          </span>
+          <span className="text-[10px] font-mono text-primary font-bold bg-primary/10 px-1.5 py-0.5 rounded-md">#{record.id}</span>
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-2 mb-2.5">
+        <div><p className="text-[9px] text-[#4e7397] uppercase font-bold">BP</p><p className="text-xs font-mono font-semibold text-[#0e141b] dark:text-white">{record.blood_pressure}</p></div>
+        <div><p className="text-[9px] text-[#4e7397] uppercase font-bold">HR</p><p className="text-xs font-semibold text-[#0e141b] dark:text-white">{record.heart_rate} bpm</p></div>
+        <div><p className="text-[9px] text-[#4e7397] uppercase font-bold">Weight</p><p className="text-xs font-semibold text-[#0e141b] dark:text-white">{record.weight} kg</p></div>
+        {record.blood_sugar && (
+          <div><p className="text-[9px] text-[#4e7397] uppercase font-bold">Blood Sugar</p><p className="text-xs font-semibold text-[#0e141b] dark:text-white">{record.blood_sugar}</p></div>
+        )}
+        {record.remarks && (
+          <div className="col-span-3"><p className="text-[9px] text-[#4e7397] uppercase font-bold">Remarks</p><p className="text-xs text-slate-600 dark:text-slate-400 truncate">{record.remarks}</p></div>
+        )}
+      </div>
+      <div className="flex gap-2 pt-2.5 border-t border-[#e7edf3] dark:border-slate-800">
+        <button onClick={() => setModal({ type: "view", record })}
+          className="flex-1 flex items-center justify-center gap-1.5 p-2 text-[#4e7397] hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-xs sm:text-sm">
+          <span className="material-symbols-outlined text-base">visibility</span>
+          <span className="hidden sm:inline">View</span>
+        </button>
+        <button onClick={() => setModal({ type: "edit", record })}
+          className="flex-1 flex items-center justify-center gap-1.5 p-2 text-[#4e7397] hover:text-primary hover:bg-primary/10 rounded-lg transition-colors text-xs sm:text-sm">
+          <span className="material-symbols-outlined text-base">edit</span>
+          <span className="hidden sm:inline">Edit</span>
+        </button>
+        <button onClick={() => setModal({ type: "delete", record })}
+          className="flex-1 flex items-center justify-center gap-1.5 p-2 text-[#4e7397] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors text-xs sm:text-sm">
+          <span className="material-symbols-outlined text-base">delete</span>
+          <span className="hidden sm:inline">Delete</span>
+        </button>
+      </div>
+    </div>
+  );
+
+  // ── Health Record Form ──
+  const HealthForm = () => (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+      {[
+        { label: "PWD ID",             name: "pwd_id",         type: "number",               placeholder: "e.g. 1",      required: true },
+        { label: "Blood Pressure",      name: "blood_pressure",                               placeholder: "e.g. 120/80", required: true },
+        { label: "Heart Rate (bpm)",    name: "heart_rate",     type: "number",               placeholder: "e.g. 72",     required: true },
+        { label: "Temperature (°C)",    name: "temperature",    type: "number", step: "0.01", placeholder: "e.g. 36.5",   required: true },
+        { label: "Weight (kg)",         name: "weight",         type: "number", step: "0.01", placeholder: "e.g. 65.0",   required: true },
+        { label: "Blood Sugar (mg/dL)", name: "blood_sugar",    type: "number", step: "0.01", placeholder: "Optional" },
+        { label: "Remarks",             name: "remarks",                                      placeholder: "Optional" },
+      ].map(({ label, name, ...props }) => (
+        <div key={name} className="flex flex-col gap-1">
+          <label className="text-[10px] font-semibold text-[#4e7397] dark:text-slate-400 uppercase tracking-wider">{label}</label>
+          <input name={name} defaultValue={modal.record?.[name] ?? ""}
+            className="border border-[#d0dbe7] dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+            {...props} />
+        </div>
+      ))}
+      <div className="flex flex-col gap-1">
+        <label className="text-[10px] font-semibold text-[#4e7397] dark:text-slate-400 uppercase tracking-wider">Health Status</label>
+        <select name="health_status" defaultValue={modal.record?.health_status || "Stable"}
+          className="border border-[#d0dbe7] dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 appearance-none">
+          <option value="Stable">Stable</option>
+          <option value="Follow-up">Follow-up</option>
+          <option value="Critical">Critical</option>
+        </select>
+      </div>
+      <div className="flex flex-col-reverse lg:flex-row justify-end gap-2 mt-2">
+        <button type="button" onClick={closeModal}
+          className="px-4 py-2.5 border rounded-xl text-sm dark:border-slate-700 dark:text-slate-300">Cancel</button>
+        <button type="submit" disabled={submitting}
+          className="px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-bold disabled:opacity-60">
+          {submitting ? "Saving…" : modal.type === "add" ? "Add Record" : "Update Record"}
+        </button>
+      </div>
+    </form>
+  );
+
+  return (
+    <div className="px-3 sm:px-4 md:px-8 py-4 sm:py-6 md:py-8 w-full flex flex-col gap-4 sm:gap-6 md:gap-8">
+
+      {/* ── Header ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4
+        bg-gradient-to-r from-slate-50 to-transparent dark:from-slate-800/30 dark:to-transparent
+        p-3 sm:p-5 md:p-6 rounded-2xl border border-slate-100 dark:border-slate-800/50">
+        <div className="flex flex-col gap-1 min-w-0">
+          <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-black text-[#0e141b] dark:text-white leading-tight tracking-tight">
             Health Monitoring
           </h1>
-          <p className="text-[#4e7397] dark:text-slate-400 text-sm md:text-base">
+          <p className="text-xs sm:text-sm md:text-base text-[#4e7397] dark:text-slate-400">
             Manage and monitor PWD health records across the barangay
           </p>
         </div>
-        <button
-          onClick={() => setModal({ type: "add", record: null })}
-          className="flex items-center gap-2 px-4 md:px-6 py-2 bg-primary text-white rounded-lg text-sm md:text-base font-bold shadow-md hover:bg-blue-600 transition-colors whitespace-nowrap"
-        >
-          <span className="material-symbols-outlined text-sm md:text-base">add</span>
-          Record New Checkup
-        </button>
+        <div className="flex-shrink-0">
+          <button onClick={() => setModal({ type: "add", record: null })}
+            className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-6 py-2 sm:py-2.5
+              bg-primary text-white rounded-xl text-xs sm:text-sm md:text-base font-bold
+              shadow-md hover:bg-primary/90 transition-colors whitespace-nowrap w-full sm:w-auto">
+            <span className="material-symbols-outlined text-sm sm:text-base">add</span>
+            Record New Checkup
+          </button>
+        </div>
       </div>
 
-      {/* Error / Loading */}
+      {/* ── Error ── */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm flex items-center gap-2">
-          <span className="material-symbols-outlined text-base">error</span>
-          {error} —{" "}
-          <button onClick={fetchRecords} className="underline font-bold">Retry</button>
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm flex items-center gap-2">
+          <span className="material-symbols-outlined text-base flex-shrink-0">error</span>
+          {error} — <button onClick={fetchRecords} className="underline font-bold">Retry</button>
         </div>
       )}
 
-      {/* Table */}
-      <div className="bg-white dark:bg-slate-900 border border-[#d0dbe7] dark:border-slate-800 rounded-xl overflow-x-auto shadow-sm">
-        {loading ? (
-          <div className="flex items-center justify-center py-20 text-[#4e7397] gap-3">
-            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-            </svg>
-            Loading records…
-          </div>
-        ) : (
-          <table className="w-full min-w-[700px] text-left border-collapse">
-            <thead className="bg-slate-50 dark:bg-slate-800/50">
-              <tr>
-                {["Health ID","PWD ID","Blood Pressure","Heart Rate","Weight","Blood Sugar","Status","Remarks","Date","Actions"].map((col, i) => (
-                  <th key={i} className="px-4 md:px-6 py-3 text-xs font-bold text-[#4e7397] dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">
-                    {col}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#d0dbe7] dark:divide-slate-800">
-              {paginatedRecords.length === 0 ? (
-                <tr>
-                  <td colSpan={10} className="text-center py-14 text-[#4e7397] text-sm">
-                    No health records found.
-                  </td>
-                </tr>
-              ) : paginatedRecords.map(record => (
-                <tr key={record.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
-                  <td className="px-4 md:px-6 py-3 text-sm font-medium text-primary">#{record.id}</td>
-                  <td className="px-4 md:px-6 py-3 text-sm text-[#4e7397]">{record.pwd_id}</td>
-                  <td className="px-4 md:px-6 py-3 text-sm font-mono">{record.blood_pressure}</td>
-                  <td className="px-4 md:px-6 py-3 text-sm">{record.heart_rate} bpm</td>
-                  <td className="px-4 md:px-6 py-3 text-sm">{record.weight} kg</td>
-                  <td className="px-4 md:px-6 py-3 text-sm">{record.blood_sugar || "—"}</td>
-                  <td className="px-4 md:px-6 py-3">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${statusColors[record.color]}`}>
-                      {record.status}
-                    </span>
-                  </td>
-                  <td className="px-4 md:px-6 py-3 text-sm text-[#4e7397] max-w-[160px] truncate" title={record.remarks}>
-                    {record.remarks || "—"}
-                  </td>
-                  <td className="px-4 md:px-6 py-3 text-sm text-[#4e7397] whitespace-nowrap">{record.date}</td>
-                  <td className="px-4 md:px-6 py-3 text-right">
-                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => setModal({ type: "edit", record })}
-                        className="p-2 hover:bg-primary/10 hover:text-primary rounded-lg transition-colors text-[#4e7397]"
-                      >
-                        <span className="material-symbols-outlined text-xl">edit</span>
-                      </button>
-                      <button
-                        onClick={() => setModal({ type: "delete", record })}
-                        className="p-2 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-[#4e7397]"
-                      >
-                        <span className="material-symbols-outlined text-xl">delete</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+      {/* ── Stats ── */}
+      <StatsGrid>
+        {statsdata.map((stat, idx) => (
+          <StatsCards key={idx} stat={stat} />
+        ))}
+      </StatsGrid>
 
-        {/* Pagination */}
-        {!loading && totalPages > 1 && (
-          <div className="px-4 md:px-6 py-4 bg-slate-50 dark:bg-slate-800/50 flex flex-wrap items-center justify-between border-t border-[#d0dbe7] dark:border-slate-800 gap-2">
-            <p className="text-sm text-[#4e7397] dark:text-slate-400">
-              Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-              {Math.min(currentPage * itemsPerPage, records.length)} of {records.length} records
-            </p>
-            <div className="flex gap-2 flex-wrap">
-              <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}
-                className="px-3 py-1 border border-[#d0dbe7] dark:border-slate-700 rounded-lg text-sm font-medium disabled:opacity-50 hover:bg-white dark:hover:bg-slate-800 transition-colors">
-                Previous
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => (
-                <button key={i + 1} onClick={() => goToPage(i + 1)}
-                  className={`px-3 py-1 rounded-lg text-sm font-medium ${currentPage === i + 1 ? "bg-primary text-white" : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 border border-[#d0dbe7] dark:border-slate-700"}`}>
-                  {i + 1}
-                </button>
-              ))}
-              <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}
-                className="px-3 py-1 border border-[#d0dbe7] dark:border-slate-700 rounded-lg text-sm font-medium disabled:opacity-50 hover:bg-white dark:hover:bg-slate-800 transition-colors">
-                Next
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6">
-        <div className="p-4 bg-white dark:bg-slate-900 border border-[#d0dbe7] dark:border-slate-800 rounded-xl">
-          <p className="text-xs font-bold text-[#4e7397] dark:text-slate-400 uppercase tracking-widest mb-1">Critical Cases</p>
-          <p className="text-2xl font-black text-red-600">{criticalCases}</p>
-        </div>
-        <div className="p-4 bg-white dark:bg-slate-900 border border-[#d0dbe7] dark:border-slate-800 rounded-xl">
-          <p className="text-xs font-bold text-[#4e7397] dark:text-slate-400 uppercase tracking-widest mb-1">Checkups This Week</p>
-          <p className="text-2xl font-black text-primary">{checkupsThisWeek}</p>
-        </div>
-        <div className="p-4 bg-white dark:bg-slate-900 border border-[#d0dbe7] dark:border-slate-800 rounded-xl">
-          <p className="text-xs font-bold text-[#4e7397] dark:text-slate-400 uppercase tracking-widest mb-1">Staff Utilization</p>
-          <p className="text-2xl font-black text-green-600">{staffUtilization}%</p>
+      {/* ── SearchBar ── */}
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+        <div className="flex-1">
+          <SearchBar
+            searchValue={search}
+            setSearchValue={(val) => { setSearch(val); setCurrentPage(1); }}
+            filterValue={filterStatus}
+            setFilterValue={(val) => { setFilterStatus(val); setCurrentPage(1); }}
+            placeholder="Search by PWD ID, name, or remarks..."
+            options={[
+              { value: "all",       label: "All Status" },
+              { value: "Stable",    label: "Stable" },
+              { value: "Follow-up", label: "Follow-up" },
+              { value: "Critical",  label: "Critical" },
+            ]}
+          />
         </div>
       </div>
 
-      {/* ── MODAL ── */}
-      {modal.type && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold dark:text-white">
-                {modal.type === "add" ? "Add Health Record"
-                  : modal.type === "edit" ? "Edit Health Record"
-                  : "Delete Record"}
-              </h2>
-              <button onClick={() => setModal({ type: null, record: null })}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                <span className="material-symbols-outlined">close</span>
-              </button>
-            </div>
-
-            {modal.type === "delete" ? (
-              <div className="flex flex-col gap-4">
-                <p className="dark:text-slate-300">
-                  Are you sure you want to delete health record{" "}
-                  <span className="font-bold">#{modal.record.id}</span>?
-                </p>
-                <div className="flex justify-end gap-2">
-                  <button onClick={() => setModal({ type: null, record: null })}
-                    className="px-4 py-2 border rounded-lg dark:border-slate-700 dark:text-slate-300">Cancel</button>
-                  <button onClick={handleDelete} disabled={submitting}
-                    className="px-4 py-2 bg-red-500 text-white rounded-lg disabled:opacity-60">
-                    {submitting ? "Deleting…" : "Delete"}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-                {[
-                  { label: "PWD ID", name: "pwd_id", type: "number", placeholder: "e.g. 1", required: true },
-                  { label: "Blood Pressure", name: "blood_pressure", placeholder: "e.g. 120/80", required: true },
-                  { label: "Heart Rate (bpm)", name: "heart_rate", type: "number", placeholder: "e.g. 72", required: true },
-                  { label: "Temperature (°C)", name: "temperature", type: "number", step: "0.01", placeholder: "e.g. 36.5", required: true },
-                  { label: "Weight (kg)", name: "weight", type: "number", step: "0.01", placeholder: "e.g. 65.0", required: true },
-                  { label: "Blood Sugar (mg/dL)", name: "blood_sugar", type: "number", step: "0.01", placeholder: "Optional" },
-                  { label: "Remarks", name: "remarks", placeholder: "Optional" },
-                ].map(({ label, name, ...props }) => (
-                  <div key={name} className="flex flex-col gap-1">
-                    <label className="text-xs font-semibold text-[#4e7397] dark:text-slate-400 uppercase tracking-wider">
-                      {label}
-                    </label>
-                    <input
-                      name={name}
-                      defaultValue={modal.record?.[name] ?? ""}
-                      className="border border-[#d0dbe7] dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                      {...props}
-                    />
-                  </div>
-                ))}
-
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-semibold text-[#4e7397] dark:text-slate-400 uppercase tracking-wider">
-                    Health Status
-                  </label>
-                  <select name="health_status"
-                    defaultValue={modal.record?.health_status || "Stable"}
-                    className="border border-[#d0dbe7] dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40">
-                    <option value="Stable">Stable</option>
-                    <option value="Follow-up">Follow-up</option>
-                    <option value="Critical">Critical</option>
-                  </select>
-                </div>
-
-                <div className="flex justify-end gap-2 mt-2">
-                  <button type="button" onClick={() => setModal({ type: null, record: null })}
-                    className="px-4 py-2 border rounded-lg dark:border-slate-700 dark:text-slate-300">Cancel</button>
-                  <button type="submit" disabled={submitting}
-                    className="px-4 py-2 bg-primary text-white rounded-lg disabled:opacity-60">
-                    {submitting ? "Saving…" : modal.type === "add" ? "Add Record" : "Update Record"}
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
+      {/* ── DataTable ── */}
+      {loading ? (
+        <div className="flex items-center justify-center py-20 text-[#4e7397] gap-3">
+          <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+          </svg>
+          <span className="text-sm">Loading records…</span>
         </div>
+      ) : (
+        <DataTable
+          columns={["Health ID", "PWD ID", "Blood Pressure", "Heart Rate", "Weight", "Blood Sugar", "Status", "Remarks", "Date", "Actions"]}
+          data={paginatedRecords}
+          renderRow={renderRow}
+          renderCard={renderCard}
+          empty="No health records found."
+          pagination={
+            totalPages > 1 ? (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={filtered.length}
+                itemsPerPage={itemsPerPage}
+                onPageChange={goToPage}
+              />
+            ) : null
+          }
+        />
+      )}
+
+      {/* ── View Modal ── */}
+      {modal.type === "view" && (
+        <ViewModal
+          title="Health Record" icon="monitor_heart"
+          data={{
+            "Health ID":    `#${modal.record.id}`,
+            "PWD ID":       modal.record.pwd_id,
+            "Blood Pressure": modal.record.blood_pressure,
+            "Heart Rate":   `${modal.record.heart_rate} bpm`,
+            "Weight":       `${modal.record.weight} kg`,
+            "Blood Sugar":  modal.record.blood_sugar || "—",
+            "Status":       modal.record.status,
+            "Remarks":      modal.record.remarks || "—",
+            "Date":         modal.record.date,
+          }}
+          onClose={closeModal}
+        />
+      )}
+
+      {/* ── Add Modal ── */}
+      {modal.type === "add" && (
+        <AddEditModal isOpen isEdit={false} title="Health Record" icon="monitor_heart" onCancel={closeModal}>
+          <HealthForm />
+        </AddEditModal>
+      )}
+
+      {/* ── Edit Modal ── */}
+      {modal.type === "edit" && (
+        <AddEditModal isOpen isEdit={true} title="Health Record" icon="monitor_heart" onCancel={closeModal}>
+          <HealthForm />
+        </AddEditModal>
+      )}
+
+      {/* ── Delete Modal ── */}
+      {modal.type === "delete" && (
+        <DeleteModal
+          title="Delete Record"
+          message="Are you sure you want to delete health record"
+          subject={`#${modal.record.id}`}
+          confirmText={submitting ? "Deleting…" : "Delete"}
+          onConfirm={handleDelete}
+          onCancel={closeModal}
+        />
       )}
     </div>
   );

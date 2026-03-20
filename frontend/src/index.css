@@ -25,4 +25,11 @@
     background: linear-gradient(135deg, #10b981, #3b82f6);
   }
 
+  /* Smooth scrolling on all devices */
+  @supports (scroll-behavior: smooth) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
 }

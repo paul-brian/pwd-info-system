@@ -4,7 +4,7 @@ import Features from "../../features/landing/Features";
 import DashboardPreview from "../../features/landing/DashboardPreview";
 import Impact from "../../features/landing/impact";
 import CTA from "../../features/landing/CTA";
-import Footer from "../../components/Footer";
+import Footer from "../../components/ui/Footer";
 
 function PagesLandingLayout() {
   return (

@@ -1,13 +1,17 @@
 import { useState, useEffect } from "react";
 import API_URL from "../../api/api";
-
+import StatsCards from "../../components/ui/StatsCards";
+import StatsGrid from "../../components/ui/StatsGrid";
+import DataTable from "../../components/ui/DataTable";
+import Pagination from "../../components/ui/Pagination";
+import SearchBar from "../../components/ui/SearchBar";
+import AddEditModal from "../../components/modals/AddEditModal";
+import DeleteModal from "../../components/modals/DeleteModal";
+import ViewModal from "../../components/modals/ViewModal";
 
 const API_BASE = `${API_URL}/api`;
 
-// ─── SHARED HELPERS ────────────────────────────────────────────────────────────
-
-
-
+// ─── HELPERS ───────────────────────────────────────────────────────────────────
 const getStatus = (qty, threshold = 5) =>
   qty === 0 ? "Out of Stock" : qty <= threshold ? "Low Stock" : "In Stock";
 const getColor = (qty, threshold = 5) =>
@@ -15,63 +19,41 @@ const getColor = (qty, threshold = 5) =>
 
 const StatusBadge = ({ qty, threshold }) => {
   const color = getColor(qty, threshold);
-  const status = getStatus(qty, threshold);
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
-      color === "red" ? "bg-red-100 text-red-600"
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
+      color === "red"      ? "bg-red-100 text-red-600"
       : color === "yellow" ? "bg-yellow-100 text-yellow-600"
       : "bg-emerald-100 text-emerald-600"
-    }`}>{status}</span>
+    }`}>{getStatus(qty, threshold)}</span>
   );
 };
 
 const ErrorBanner = ({ message }) => (
-  <div className="flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
-    <span className="material-symbols-outlined text-[18px]">error</span>
-    {message} — Make sure your backend is running on port 5000.
-  </div>
-);
-
-const LoadingRow = ({ cols, text }) => (
-  <tr><td colSpan={cols} className="py-16">
-    <div className="flex items-center justify-center gap-3 text-[#4e7397]">
-      <span className="material-symbols-outlined animate-spin">progress_activity</span>
-      {text}
-    </div>
-  </td></tr>
-);
-
-
-const EmptyRow = ({ cols, text }) => (
-  <tr><td colSpan={cols} className="py-12 text-center text-[#4e7397] text-sm">{text}</td></tr>
-);
-
-const Pagination = ({ currentPage, totalPages, setCurrentPage, totalItems, itemsPerPage }) => (
-  <div className="px-5 py-4 flex flex-wrap items-center justify-between border-t border-[#e7edf3] dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 gap-2">
-    <p className="text-sm text-[#4e7397]">
-      Showing {totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}–{Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems}
-    </p>
-    <div className="flex gap-2 flex-wrap">
-      <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1} className="px-3 py-1 border border-[#d0dbe7] dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 text-sm disabled:opacity-50">Previous</button>
-      {Array.from({ length: totalPages }, (_, i) => (
-        <button key={i} onClick={() => setCurrentPage(i + 1)} className={`px-3 py-1 rounded-md text-sm font-bold ${currentPage === i + 1 ? "bg-primary text-white" : "bg-white dark:bg-slate-900 border border-[#d0dbe7] dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50"}`}>{i + 1}</button>
-      ))}
-      <button onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages || totalPages === 0} className="px-3 py-1 border border-[#d0dbe7] dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 text-sm disabled:opacity-50">Next</button>
-    </div>
+  <div className="flex items-start gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-xs sm:text-sm">
+    <span className="material-symbols-outlined text-base flex-shrink-0 mt-0.5">error</span>
+    <span>{message} — Make sure your backend is running on port 5000.</span>
   </div>
 );
 
 // ─── INVENTORY TAB ─────────────────────────────────────────────────────────────
 const InventoryTab = ({ inventoryItems, loading, error, onRefresh }) => {
   const [search, setSearch] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [modal, setModal] = useState({ type: null, item: null });
   const itemsPerPage = 5;
 
-  const filtered = inventoryItems.filter(item =>
-    String(item.inventory_id).includes(search.toLowerCase()) ||
-    item.item_name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = inventoryItems.filter(item => {
+    const matchStatus =
+      filterStatus === "all" ? true
+      : filterStatus === "out" ? item.quantity === 0
+      : filterStatus === "low" ? item.quantity > 0 && item.quantity <= (item.low_stock_threshold || 5)
+      : true;
+    const matchSearch =
+      String(item.inventory_id).includes(search.toLowerCase()) ||
+      item.item_name.toLowerCase().includes(search.toLowerCase());
+    return matchStatus && matchSearch;
+  });
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
@@ -80,9 +62,9 @@ const InventoryTab = ({ inventoryItems, loading, error, onRefresh }) => {
     const form = e.target;
     const payload = {
       item_name: form.item_name.value,
-      category: form.category.value,
-      quantity: parseInt(form.quantity.value),
-      unit: form.unit.value,
+      category:  form.category.value,
+      quantity:  parseInt(form.quantity.value),
+      unit:      form.unit.value,
     };
     try {
       const url = modal.type === "add" ? `${API_BASE}/inventory` : `${API_BASE}/inventory/${modal.item.inventory_id}`;
@@ -103,100 +85,139 @@ const InventoryTab = ({ inventoryItems, loading, error, onRefresh }) => {
     } catch (err) { alert(err.message); }
   };
 
+  const renderRow = (item) => (
+    <tr key={item.inventory_id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+      <td className="px-4 lg:px-5 py-3 lg:py-4 font-mono text-xs text-primary font-bold text-center">{item.inventory_id}</td>
+      <td className="px-4 lg:px-5 py-3 lg:py-4 font-bold text-[#0e141b] dark:text-white text-sm">{item.item_name}</td>
+      <td className="px-4 lg:px-5 py-3 lg:py-4 text-sm text-slate-600 dark:text-slate-400">{item.category}</td>
+      <td className="px-4 lg:px-5 py-3 lg:py-4 text-sm font-medium text-center">{item.quantity}</td>
+      <td className="px-4 lg:px-5 py-3 lg:py-4 text-sm text-center">{item.unit || "—"}</td>
+      <td className="px-4 lg:px-5 py-3 lg:py-4 text-center"><StatusBadge qty={item.quantity} threshold={item.low_stock_threshold} /></td>
+      <td className="px-4 lg:px-5 py-3 lg:py-4 text-center">
+        <div className="flex justify-center gap-1">
+          <button onClick={() => setModal({ type: "view", item })} className="p-1.5 text-[#4e7397] hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View">
+            <span className="material-symbols-outlined text-[20px]">visibility</span>
+          </button>
+          <button onClick={() => setModal({ type: "edit", item })} className="p-1.5 text-[#4e7397] hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" title="Edit">
+            <span className="material-symbols-outlined text-[20px]">edit_note</span>
+          </button>
+          <button onClick={() => setModal({ type: "delete", item })} className="p-1.5 text-[#4e7397] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+            <span className="material-symbols-outlined text-[20px]">delete_forever</span>
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+
+  const renderCard = (item) => (
+    <div key={item.inventory_id} className="bg-white dark:bg-slate-900 rounded-xl border border-[#e7edf3] dark:border-slate-800 p-3 shadow-sm">
+      <div className="flex items-start justify-between gap-2 mb-2.5">
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-sm text-[#0e141b] dark:text-white truncate">{item.item_name}</p>
+          <p className="text-xs text-[#4e7397] mt-0.5">{item.category}</p>
+        </div>
+        <StatusBadge qty={item.quantity} threshold={item.low_stock_threshold} />
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="flex gap-4">
+          <div><p className="text-[9px] text-[#4e7397] uppercase font-bold">Qty</p><p className="text-sm font-bold text-[#0e141b] dark:text-white">{item.quantity}</p></div>
+          <div><p className="text-[9px] text-[#4e7397] uppercase font-bold">Unit</p><p className="text-sm text-slate-600 dark:text-slate-400">{item.unit || "—"}</p></div>
+          <div><p className="text-[9px] text-[#4e7397] uppercase font-bold">ID</p><p className="text-xs font-mono text-primary font-bold">{item.inventory_id}</p></div>
+        </div>
+        <div className="flex gap-1">
+          <button onClick={() => setModal({ type: "view", item })} className="p-2 text-[#4e7397] hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+            <span className="material-symbols-outlined text-base">visibility</span>
+          </button>
+          <button onClick={() => setModal({ type: "edit", item })} className="p-2 text-[#4e7397] hover:text-primary hover:bg-primary/10 rounded-lg transition-colors">
+            <span className="material-symbols-outlined text-base">edit_note</span>
+          </button>
+          <button onClick={() => setModal({ type: "delete", item })} className="p-2 text-[#4e7397] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+            <span className="material-symbols-outlined text-base">delete_forever</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const ItemForm = () => (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+      {[
+        { name: "item_name", label: "Item Name", placeholder: "e.g. Folding Wheelchair", val: modal.item?.item_name },
+        { name: "category",  label: "Category",  placeholder: "e.g. Wheelchair",         val: modal.item?.category },
+        { name: "unit",      label: "Unit",      placeholder: "e.g. pcs, box, pair",     val: modal.item?.unit },
+      ].map(f => (
+        <div key={f.name} className="flex flex-col gap-1">
+          <label className="text-[10px] font-semibold text-[#4e7397] uppercase">{f.label}</label>
+          <input name={f.name} placeholder={f.placeholder} defaultValue={f.val || ""} required={f.name !== "unit"}
+            className="border rounded-xl px-3 py-2.5 text-sm dark:bg-slate-800 dark:border-slate-700 dark:text-white" />
+        </div>
+      ))}
+      <div className="flex flex-col gap-1">
+        <label className="text-[10px] font-semibold text-[#4e7397] uppercase">Quantity</label>
+        <input name="quantity" type="number" min="0" defaultValue={modal.item?.quantity || 0} required
+          className="border rounded-xl px-3 py-2.5 text-sm dark:bg-slate-800 dark:border-slate-700 dark:text-white" />
+      </div>
+      <div className="flex justify-end gap-2 mt-2">
+        <button type="button" onClick={() => setModal({ type: null, item: null })} className="px-4 py-2.5 border rounded-xl text-sm">Cancel</button>
+        <button type="submit" className="px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-bold">
+          {modal.type === "add" ? "Add" : "Save"}
+        </button>
+      </div>
+    </form>
+  );
+
   return (
-    <div className="flex flex-col gap-5">
-      {/* Toolbar */}
-      <div className="flex flex-col md:flex-row justify-between gap-3 items-center">
-        <div className="relative flex-1 max-w-md">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#4e7397]">search</span>
-          <input value={search} onChange={e => { setSearch(e.target.value); setCurrentPage(1); }}
-            className="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg focus:ring-2 focus:ring-primary text-sm"
-            placeholder="Search by name or ID..." />
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+        <div className="flex-1">
+          <SearchBar
+            searchValue={search}
+            setSearchValue={(val) => { setSearch(val); setCurrentPage(1); }}
+            filterValue={filterStatus}
+            setFilterValue={(val) => { setFilterStatus(val); setCurrentPage(1); }}
+            placeholder="Search by name or ID..."
+            options={[
+              { value: "all", label: "All" },
+              { value: "low", label: "Low Stock" },
+              { value: "out", label: "Out of Stock" },
+            ]}
+          />
         </div>
         <button onClick={() => setModal({ type: "add", item: null })}
-          className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-md whitespace-nowrap">
-          <span className="material-symbols-outlined">add_circle</span>Add Item
+          className="flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5
+            bg-primary text-white font-bold rounded-xl hover:bg-primary/90
+            transition-colors shadow-md text-xs sm:text-sm whitespace-nowrap flex-shrink-0 h-fit">
+          <span className="material-symbols-outlined text-base">add_circle</span>
+          <span className="hidden sm:inline">Add Item</span>
         </button>
       </div>
 
       {error && <ErrorBanner message={error} />}
 
-      {/* Table */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-[#d0dbe7] dark:border-slate-800 shadow-sm overflow-x-auto">
-        <table className="w-full text-left border-collapse min-w-[700px]">
-          <thead className="bg-slate-50 dark:bg-slate-800/50">
-            <tr>{["ID", "Item Name", "Category", "Quantity", "Unit", "Status", "Actions"].map((col, i) => (
-              <th key={i} className="px-5 py-3 text-xs font-bold text-[#4e7397] uppercase tracking-wider text-center">{col}</th>
-            ))}</tr>
-          </thead>
-          <tbody className="divide-y divide-[#e7edf3] dark:divide-slate-800">
-            {loading ? <LoadingRow cols={7} text="Loading inventory..." />
-              : paginated.length === 0 ? <EmptyRow cols={7} text="No items found." />
-              : paginated.map(item => (
-                <tr key={item.inventory_id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                  <td className="px-5 py-3 font-mono text-xs text-primary font-bold text-center">{item.inventory_id}</td>
-                  <td className="px-5 py-3 font-bold text-[#0e141b] dark:text-white text-sm">{item.item_name}</td>
-                  <td className="px-5 py-3 text-sm">{item.category}</td>
-                  <td className="px-5 py-3 text-sm font-medium text-center">{item.quantity}</td>
-                  <td className="px-5 py-3 text-sm text-center">{item.unit || "—"}</td>
-                  <td className="px-5 py-3 text-center"><StatusBadge qty={item.quantity} threshold={item.low_stock_threshold} /></td>
-                  <td className="px-5 py-3 text-center">
-                    <div className="flex justify-center gap-2">
-                      <button onClick={() => setModal({ type: "edit", item })} className="p-1.5 text-[#4e7397] hover:text-primary hover:bg-primary/10 rounded-lg transition-colors">
-                        <span className="material-symbols-outlined text-[20px]">edit_note</span>
-                      </button>
-                      <button onClick={() => setModal({ type: "delete", item })} className="p-1.5 text-[#4e7397] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
-                        <span className="material-symbols-outlined text-[20px]">delete_forever</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-        {!loading && <Pagination currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} totalItems={filtered.length} itemsPerPage={itemsPerPage} />}
-      </div>
+      <DataTable
+        columns={["ID", "Item Name", "Category", "Quantity", "Unit", "Status", "Actions"]}
+        data={paginated} renderRow={renderRow} renderCard={renderCard} empty="No items found."
+        pagination={<Pagination currentPage={currentPage} totalPages={totalPages} totalItems={filtered.length} itemsPerPage={itemsPerPage} onPageChange={(p) => setCurrentPage(p)} />}
+      />
 
-      {/* Modal */}
-      {modal.type && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-xl max-w-md w-full shadow-xl">
-            {modal.type === "delete" ? (
-              <>
-                <h2 className="text-xl font-bold mb-4">Delete Item</h2>
-                <p>Are you sure you want to delete <span className="font-bold">{modal.item.item_name}</span>?</p>
-                <div className="flex justify-end gap-2 mt-6">
-                  <button onClick={() => setModal({ type: null, item: null })} className="px-4 py-2 border rounded-lg text-sm">Cancel</button>
-                  <button onClick={handleDelete} className="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-bold">Delete</button>
-                </div>
-              </>
-            ) : (
-              <>
-                <h2 className="text-xl font-bold mb-5">{modal.type === "add" ? "Add New Item" : "Edit Item"}</h2>
-                <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-                  {[
-                    { name: "item_name", label: "Item Name", placeholder: "e.g. Folding Wheelchair", defaultValue: modal.item?.item_name },
-                    { name: "category", label: "Category", placeholder: "e.g. Wheelchair", defaultValue: modal.item?.category },
-                    { name: "unit", label: "Unit", placeholder: "e.g. pcs, box, pair", defaultValue: modal.item?.unit },
-                  ].map(f => (
-                    <div key={f.name} className="flex flex-col gap-1">
-                      <label className="text-xs font-semibold text-[#4e7397] uppercase">{f.label}</label>
-                      <input name={f.name} placeholder={f.placeholder} defaultValue={f.defaultValue || ""} required={f.name !== "unit"} className="border rounded-lg px-3 py-2 text-sm" />
-                    </div>
-                  ))}
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs font-semibold text-[#4e7397] uppercase">Quantity</label>
-                    <input name="quantity" type="number" min="0" defaultValue={modal.item?.quantity || 0} required className="border rounded-lg px-3 py-2 text-sm" />
-                  </div>
-                  <div className="flex justify-end gap-2 mt-2">
-                    <button type="button" onClick={() => setModal({ type: null, item: null })} className="px-4 py-2 border rounded-lg text-sm">Cancel</button>
-                    <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold">{modal.type === "add" ? "Add" : "Save"}</button>
-                  </div>
-                </form>
-              </>
-            )}
-          </div>
-        </div>
+      {modal.type === "view" && (
+        <ViewModal title="Item Details" icon="inventory"
+          data={{ "Item Name": modal.item.item_name, "Category": modal.item.category, "Quantity": modal.item.quantity, "Unit": modal.item.unit || "—", "Status": getStatus(modal.item.quantity, modal.item.low_stock_threshold) }}
+          onClose={() => setModal({ type: null, item: null })} />
+      )}
+      {modal.type === "add" && (
+        <AddEditModal isOpen isEdit={false} title="Item" icon="inventory" onCancel={() => setModal({ type: null, item: null })}>
+          <ItemForm />
+        </AddEditModal>
+      )}
+      {modal.type === "edit" && (
+        <AddEditModal isOpen isEdit={true} title="Item" icon="edit_note" onCancel={() => setModal({ type: null, item: null })}>
+          <ItemForm />
+        </AddEditModal>
+      )}
+      {modal.type === "delete" && (
+        <DeleteModal title="Delete Item" message="Are you sure you want to delete" subject={modal.item.item_name} confirmText="Delete"
+          onConfirm={handleDelete} onCancel={() => setModal({ type: null, item: null })} />
       )}
     </div>
   );
@@ -207,9 +228,10 @@ const DonationsTab = ({ inventoryItems, onInventoryRefresh }) => {
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [modal, setModal] = useState(false);
+  const [modal, setModal] = useState({ type: null, data: null });
   const [submitting, setSubmitting] = useState(false);
   const [search, setSearch] = useState("");
+  const [filterCategory, setFilterCategory] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -226,115 +248,273 @@ const DonationsTab = ({ inventoryItems, onInventoryRefresh }) => {
 
   useEffect(() => { fetchDonations(); }, []);
 
+  const closeModal = () => setModal({ type: null, data: null });
+
+  // ── Add ──
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
     const payload = {
-      donor_name: form.donor_name.value,
-      Item_id: parseInt(form.Item_id.value),       // capital I — matches schema
-      category: form.category.value,
-      quantity: parseInt(form.quantity.value),
-      donations_date: form.donations_date.value,   // matches schema column name
+      donor_name:     form.donor_name.value,
+      Item_id:        parseInt(form.Item_id.value),
+      category:       form.category.value,
+      quantity:       parseInt(form.quantity.value),
+      donations_date: form.donations_date.value,
     };
     try {
       setSubmitting(true);
-      const res = await fetch(`${API_BASE}/donations`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      const res = await fetch(`${API_BASE}/donations`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
       if (!res.ok) throw new Error("Failed to record donation");
       await fetchDonations();
       await onInventoryRefresh();
-      setModal(false);
+      closeModal();
     } catch (err) { alert(err.message); }
     finally { setSubmitting(false); }
   };
 
-  const filtered = donations.filter(d =>
-    (d.donor_name || "").toLowerCase().includes(search.toLowerCase()) ||
-    (d.item_name || "").toLowerCase().includes(search.toLowerCase())
-  );
+  // ── Edit ──
+  const handleEdit = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const payload = {
+      donor_name:     form.donor_name.value,
+      Item_id:        parseInt(form.Item_id.value),
+      category:       form.category.value,
+      quantity:       parseInt(form.quantity.value),
+      donations_date: form.donations_date.value,
+    };
+    try {
+      setSubmitting(true);
+      const res = await fetch(`${API_BASE}/donations/${modal.data.donation_id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("Failed to update donation");
+      await fetchDonations();
+      await onInventoryRefresh();
+      closeModal();
+    } catch (err) { alert(err.message); }
+    finally { setSubmitting(false); }
+  };
+
+  // ── Delete ──
+  const handleDelete = async () => {
+    try {
+      setSubmitting(true);
+      const res = await fetch(`${API_BASE}/donations/${modal.data.donation_id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete donation");
+      await fetchDonations();
+      await onInventoryRefresh();
+      closeModal();
+    } catch (err) { alert(err.message); }
+    finally { setSubmitting(false); }
+  };
+
+  const filtered = donations.filter(d => {
+    const matchCategory = filterCategory === "all" || (d.category || "").toLowerCase() === filterCategory.toLowerCase();
+    const matchSearch =
+      (d.donor_name || "").toLowerCase().includes(search.toLowerCase()) ||
+      (d.item_name  || "").toLowerCase().includes(search.toLowerCase());
+    return matchCategory && matchSearch;
+  });
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  return (
-    <div className="flex flex-col gap-5">
-      <div className="flex flex-col md:flex-row justify-between gap-3 items-center">
-        <div className="relative flex-1 max-w-md">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#4e7397]">search</span>
-          <input value={search} onChange={e => { setSearch(e.target.value); setCurrentPage(1); }}
-            className="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg focus:ring-2 focus:ring-primary text-sm"
-            placeholder="Search by donor or item..." />
+  // ── Desktop row ──
+  const renderRow = (d, i) => (
+    <tr key={d.donation_id || i} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+      <td className="px-4 lg:px-5 py-3 lg:py-4 font-mono text-xs text-primary font-bold text-center">{d.donation_id}</td>
+      <td className="px-4 lg:px-5 py-3 lg:py-4 font-semibold text-[#0e141b] dark:text-white text-sm">{d.donor_name}</td>
+      <td className="px-4 lg:px-5 py-3 lg:py-4 text-sm text-slate-600 dark:text-slate-400">{d.item_name}</td>
+      <td className="px-4 lg:px-5 py-3 lg:py-4 text-sm font-medium text-center">{d.quantity}</td>
+      <td className="px-4 lg:px-5 py-3 lg:py-4 text-sm text-center whitespace-nowrap">{d.donations_date ? new Date(d.donations_date).toLocaleDateString() : "—"}</td>
+      <td className="px-4 lg:px-5 py-3 lg:py-4 text-sm text-[#4e7397]">{d.category || "—"}</td>
+      <td className="px-4 lg:px-5 py-3 lg:py-4 text-center">
+        <div className="flex justify-center gap-1">
+          <button onClick={() => setModal({ type: "view", data: d })}
+            className="p-1.5 text-[#4e7397] hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View">
+            <span className="material-symbols-outlined text-[20px]">visibility</span>
+          </button>
+          <button onClick={() => setModal({ type: "edit", data: d })}
+            className="p-1.5 text-[#4e7397] hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit">
+            <span className="material-symbols-outlined text-[20px]">edit_note</span>
+          </button>
+          <button onClick={() => setModal({ type: "delete", data: d })}
+            className="p-1.5 text-[#4e7397] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+            <span className="material-symbols-outlined text-[20px]">delete_forever</span>
+          </button>
         </div>
-        <button onClick={() => setModal(true)}
-          className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-md whitespace-nowrap">
-          <span className="material-symbols-outlined">volunteer_activism</span>Record Donation
+      </td>
+    </tr>
+  );
+
+  // ── Mobile card ──
+  const renderCard = (d, i) => (
+    <div key={d.donation_id || i} className="bg-white dark:bg-slate-900 rounded-xl border border-[#e7edf3] dark:border-slate-800 p-3 shadow-sm">
+      <div className="flex items-start justify-between gap-2 mb-2.5">
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-sm text-[#0e141b] dark:text-white truncate">{d.donor_name}</p>
+          <p className="text-xs text-[#4e7397] mt-0.5">{d.item_name}</p>
+        </div>
+        <span className="text-[10px] font-mono text-primary font-bold bg-primary/10 px-1.5 py-0.5 rounded-md flex-shrink-0">#{d.donation_id}</span>
+      </div>
+      <div className="flex gap-4 mb-2.5">
+        <div><p className="text-[9px] text-[#4e7397] uppercase font-bold">Qty</p><p className="text-sm font-bold text-[#0e141b] dark:text-white">{d.quantity}</p></div>
+        <div><p className="text-[9px] text-[#4e7397] uppercase font-bold">Category</p><p className="text-xs text-slate-600 dark:text-slate-400">{d.category || "—"}</p></div>
+        <div><p className="text-[9px] text-[#4e7397] uppercase font-bold">Date</p><p className="text-xs text-slate-600 dark:text-slate-400">{d.donations_date ? new Date(d.donations_date).toLocaleDateString() : "—"}</p></div>
+      </div>
+      <div className="flex gap-2 pt-2.5 border-t border-[#e7edf3] dark:border-slate-800">
+        <button onClick={() => setModal({ type: "view", data: d })}
+          className="flex-1 flex items-center justify-center gap-1.5 p-2 text-[#4e7397] hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-xs sm:text-sm">
+          <span className="material-symbols-outlined text-base">visibility</span>
+          <span className="hidden sm:inline">View</span>
+        </button>
+        <button onClick={() => setModal({ type: "edit", data: d })}
+          className="flex-1 flex items-center justify-center gap-1.5 p-2 text-[#4e7397] hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors text-xs sm:text-sm">
+          <span className="material-symbols-outlined text-base">edit_note</span>
+          <span className="hidden sm:inline">Edit</span>
+        </button>
+        <button onClick={() => setModal({ type: "delete", data: d })}
+          className="flex-1 flex items-center justify-center gap-1.5 p-2 text-[#4e7397] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors text-xs sm:text-sm">
+          <span className="material-symbols-outlined text-base">delete_forever</span>
+          <span className="hidden sm:inline">Delete</span>
+        </button>
+      </div>
+    </div>
+  );
+
+  // ── Donation Form (shared by Add + Edit) ──
+  const DonationForm = ({ onSubmit }) => (
+    <form onSubmit={onSubmit} className="flex flex-col gap-3">
+      <div className="flex flex-col gap-1">
+        <label className="text-[10px] font-semibold text-[#4e7397] uppercase">Donor Name</label>
+        <input name="donor_name" placeholder="e.g. DSWD Regional Office" required
+          defaultValue={modal.data?.donor_name || ""}
+          className="border rounded-xl px-3 py-2.5 text-sm dark:bg-slate-800 dark:border-slate-700 dark:text-white" />
+      </div>
+      <div className="flex flex-col gap-1">
+        <label className="text-[10px] font-semibold text-[#4e7397] uppercase">Item</label>
+        <select name="Item_id" required className="border rounded-xl px-3 py-2.5 text-sm dark:bg-slate-800 dark:border-slate-700 dark:text-white">
+          <option value="">— Select Item —</option>
+          {inventoryItems.map(item => (
+            <option key={item.inventory_id} value={item.inventory_id}
+              selected={modal.data?.Item_id === item.inventory_id}>
+              {item.item_name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="flex flex-col gap-1">
+        <label className="text-[10px] font-semibold text-[#4e7397] uppercase">Category</label>
+        <input name="category" placeholder="e.g. Medicine, Wheelchair" required
+          defaultValue={modal.data?.category || ""}
+          className="border rounded-xl px-3 py-2.5 text-sm dark:bg-slate-800 dark:border-slate-700 dark:text-white" />
+      </div>
+      <div className="flex flex-col gap-1">
+        <label className="text-[10px] font-semibold text-[#4e7397] uppercase">Quantity</label>
+        <input name="quantity" type="number" min="1" placeholder="0" required
+          defaultValue={modal.data?.quantity || ""}
+          className="border rounded-xl px-3 py-2.5 text-sm dark:bg-slate-800 dark:border-slate-700 dark:text-white" />
+      </div>
+      <div className="flex flex-col gap-1">
+        <label className="text-[10px] font-semibold text-[#4e7397] uppercase">Donation Date</label>
+        <input name="donations_date" type="date" required
+          defaultValue={modal.data?.donations_date ? modal.data.donations_date.slice(0, 10) : ""}
+          className="border rounded-xl px-3 py-2.5 text-sm dark:bg-slate-800 dark:border-slate-700 dark:text-white" />
+      </div>
+      <div className="flex justify-end gap-2 mt-2">
+        <button type="button" onClick={closeModal} className="px-4 py-2.5 border rounded-xl text-sm">Cancel</button>
+        <button type="submit" disabled={submitting} className="px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-bold disabled:opacity-60">
+          {submitting ? "Saving..." : modal.type === "add" ? "Record Donation" : "Save Changes"}
+        </button>
+      </div>
+    </form>
+  );
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+        <div className="flex-1">
+          <SearchBar
+            searchValue={search}
+            setSearchValue={(val) => { setSearch(val); setCurrentPage(1); }}
+            filterValue={filterCategory}
+            setFilterValue={(val) => { setFilterCategory(val); setCurrentPage(1); }}
+            placeholder="Search by donor or item..."
+            options={[
+              { value: "all",        label: "All Categories" },
+              { value: "medicine",   label: "Medicine" },
+              { value: "wheelchair", label: "Wheelchair" },
+              { value: "equipment",  label: "Equipment" },
+              { value: "food",       label: "Food" },
+              { value: "clothing",   label: "Clothing" },
+            ]}
+          />
+        </div>
+        <button onClick={() => setModal({ type: "add", data: null })}
+          className="flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5
+            bg-primary text-white font-bold rounded-xl hover:bg-primary/90
+            transition-colors shadow-md text-xs sm:text-sm whitespace-nowrap flex-shrink-0 h-fit">
+          <span className="material-symbols-outlined text-base">volunteer_activism</span>
+          <span className="hidden sm:inline">Record Donation</span>
         </button>
       </div>
 
       {error && <ErrorBanner message={error} />}
 
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-[#d0dbe7] dark:border-slate-800 shadow-sm overflow-x-auto">
-        <table className="w-full text-left border-collapse min-w-[600px]">
-          <thead className="bg-slate-50 dark:bg-slate-800/50">
-            <tr>{["#", "Donor Name", "Item", "Quantity", "Date", "Category"].map((col, i) => (
-              <th key={i} className="px-5 py-3 text-xs font-bold text-[#4e7397] uppercase tracking-wider text-center">{col}</th>
-            ))}</tr>
-          </thead>
-          <tbody className="divide-y divide-[#e7edf3] dark:divide-slate-800">
-            {loading ? <LoadingRow cols={6} text="Loading donations..." />
-              : paginated.length === 0 ? <EmptyRow cols={6} text="No donations recorded yet." />
-              : paginated.map((d, i) => (
-                <tr key={d.donation_id || i} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                  <td className="px-5 py-3 font-mono text-xs text-primary font-bold text-center">{d.donation_id}</td>
-                  <td className="px-5 py-3 font-semibold text-[#0e141b] dark:text-white text-sm">{d.donor_name}</td>
-                  <td className="px-5 py-3 text-sm">{d.item_name}</td>
-                  <td className="px-5 py-3 text-sm font-medium text-center">{d.quantity}</td>
-                  <td className="px-5 py-3 text-sm text-center">{d.donations_date ? new Date(d.donations_date).toLocaleDateString() : "—"}</td>
-                  <td className="px-5 py-3 text-sm text-[#4e7397]">{d.category || "—"}</td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-        {!loading && <Pagination currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} totalItems={filtered.length} itemsPerPage={itemsPerPage} />}
-      </div>
+      <DataTable
+        columns={["#", "Donor Name", "Item", "Quantity", "Date", "Category", "Actions"]}
+        data={paginated} renderRow={renderRow} renderCard={renderCard} empty="No donations recorded yet."
+        pagination={<Pagination currentPage={currentPage} totalPages={totalPages} totalItems={filtered.length} itemsPerPage={itemsPerPage} onPageChange={(p) => setCurrentPage(p)} />}
+      />
 
-      {modal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-xl max-w-md w-full shadow-xl">
-            <h2 className="text-xl font-bold mb-5 flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">volunteer_activism</span>Record New Donation
-            </h2>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-semibold text-[#4e7397] uppercase">Donor Name</label>
-                <input name="donor_name" placeholder="e.g. DSWD Regional Office" required className="border rounded-lg px-3 py-2 text-sm" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-semibold text-[#4e7397] uppercase">Item</label>
-                <select name="Item_id" required className="border rounded-lg px-3 py-2 text-sm">
-                  <option value="">— Select Item —</option>
-                  {inventoryItems.map(item => <option key={item.inventory_id} value={item.inventory_id}>{item.item_name}</option>)}
-                </select>
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-semibold text-[#4e7397] uppercase">Category</label>
-                <input name="category" placeholder="e.g. Medicine, Wheelchair" required className="border rounded-lg px-3 py-2 text-sm" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-semibold text-[#4e7397] uppercase">Quantity</label>
-                <input name="quantity" type="number" min="1" placeholder="0" required className="border rounded-lg px-3 py-2 text-sm" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-semibold text-[#4e7397] uppercase">Donation Date</label>
-                <input name="donations_date" type="date" required className="border rounded-lg px-3 py-2 text-sm" />
-              </div>
-              <div className="flex justify-end gap-2 mt-2">
-                <button type="button" onClick={() => setModal(false)} className="px-4 py-2 border rounded-lg text-sm">Cancel</button>
-                <button type="submit" disabled={submitting} className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold disabled:opacity-60">
-                  {submitting ? "Saving..." : "Record Donation"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+      {/* ── View Modal ── */}
+      {modal.type === "view" && (
+        <ViewModal
+          title="Donation Details" icon="volunteer_activism"
+          data={{
+            "Donation ID": modal.data.donation_id,
+            "Donor Name":  modal.data.donor_name,
+            "Item":        modal.data.item_name,
+            "Category":    modal.data.category || "—",
+            "Quantity":    modal.data.quantity,
+            "Date":        modal.data.donations_date ? new Date(modal.data.donations_date).toLocaleDateString() : "—",
+          }}
+          onClose={closeModal}
+        />
+      )}
+
+      {/* ── Add Modal ── */}
+      {modal.type === "add" && (
+        <AddEditModal isOpen isEdit={false} title="Donation" icon="volunteer_activism" onCancel={closeModal}>
+          <DonationForm onSubmit={handleSubmit} />
+        </AddEditModal>
+      )}
+
+      {/* ── Edit Modal ── */}
+      {modal.type === "edit" && (
+        <AddEditModal isOpen isEdit={true} title="Donation" icon="volunteer_activism" onCancel={closeModal}>
+          <DonationForm onSubmit={handleEdit} />
+        </AddEditModal>
+      )}
+
+      {/* ── Delete Modal ── */}
+      {modal.type === "delete" && (
+        <DeleteModal
+          title="Delete Donation"
+          message="Are you sure you want to delete donation from"
+          subject={modal.data.donor_name}
+          confirmText={submitting ? "Deleting..." : "Delete"}
+          onConfirm={handleDelete}
+          onCancel={closeModal}
+        />
       )}
     </div>
   );
@@ -348,6 +528,7 @@ const DistributionTab = ({ inventoryItems, onInventoryRefresh }) => {
   const [modal, setModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [search, setSearch] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -369,10 +550,10 @@ const DistributionTab = ({ inventoryItems, onInventoryRefresh }) => {
     const form = e.target;
     const payload = {
       beneficiary_id: parseInt(form.beneficiary_id.value),
-      item_id: parseInt(form.item_id.value),
-      quantity: parseInt(form.quantity.value),
-      release_date: form.release_date.value,
-      remarks: form.remarks.value,
+      item_id:        parseInt(form.item_id.value),
+      quantity:       parseInt(form.quantity.value),
+      release_date:   form.release_date.value,
+      remarks:        form.remarks.value,
     };
     try {
       setSubmitting(true);
@@ -386,100 +567,127 @@ const DistributionTab = ({ inventoryItems, onInventoryRefresh }) => {
     finally { setSubmitting(false); }
   };
 
-  const filtered = distributions.filter(d =>
-    (d.full_name || "").toLowerCase().includes(search.toLowerCase()) ||
-    (d.item_name || "").toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = distributions.filter(d => {
+    const matchStatus = filterStatus === "all" || (d.status || "").toLowerCase() === filterStatus.toLowerCase();
+    const matchSearch =
+      (d.full_name || "").toLowerCase().includes(search.toLowerCase()) ||
+      (d.item_name  || "").toLowerCase().includes(search.toLowerCase());
+    return matchStatus && matchSearch;
+  });
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
+  const renderRow = (d, i) => (
+    <tr key={d.assistance_id || i} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+      <td className="px-4 lg:px-5 py-3 lg:py-4 font-mono text-xs text-primary font-bold text-center">{d.assistance_id}</td>
+      <td className="px-4 lg:px-5 py-3 lg:py-4 font-semibold text-[#0e141b] dark:text-white text-sm">{d.full_name || `PWD #${d.beneficiary_id}`}</td>
+      <td className="px-4 lg:px-5 py-3 lg:py-4 text-sm text-slate-600 dark:text-slate-400">{d.item_name}</td>
+      <td className="px-4 lg:px-5 py-3 lg:py-4 text-sm font-medium text-center">{d.quantity}</td>
+      <td className="px-4 lg:px-5 py-3 lg:py-4 text-sm text-center whitespace-nowrap">{d.release_date ? new Date(d.release_date).toLocaleDateString() : "—"}</td>
+      <td className="px-4 lg:px-5 py-3 lg:py-4 text-sm text-[#4e7397]">{d.remarks || "—"}</td>
+    </tr>
+  );
+
+  const renderCard = (d, i) => (
+    <div key={d.assistance_id || i} className="bg-white dark:bg-slate-900 rounded-xl border border-[#e7edf3] dark:border-slate-800 p-3 shadow-sm">
+      <div className="flex items-start justify-between gap-2 mb-2.5">
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-sm text-[#0e141b] dark:text-white truncate">{d.full_name || `PWD #${d.beneficiary_id}`}</p>
+          <p className="text-xs text-[#4e7397] mt-0.5">{d.item_name}</p>
+        </div>
+        <span className="text-[10px] font-mono text-primary font-bold bg-primary/10 px-1.5 py-0.5 rounded-md flex-shrink-0">#{d.assistance_id}</span>
+      </div>
+      <div className="flex gap-4 flex-wrap">
+        <div><p className="text-[9px] text-[#4e7397] uppercase font-bold">Qty</p><p className="text-sm font-bold text-[#0e141b] dark:text-white">{d.quantity}</p></div>
+        <div><p className="text-[9px] text-[#4e7397] uppercase font-bold">Date</p><p className="text-xs text-slate-600 dark:text-slate-400">{d.release_date ? new Date(d.release_date).toLocaleDateString() : "—"}</p></div>
+        {d.remarks && <div className="flex-1 min-w-0"><p className="text-[9px] text-[#4e7397] uppercase font-bold">Remarks</p><p className="text-xs text-slate-600 dark:text-slate-400 truncate">{d.remarks}</p></div>}
+      </div>
+    </div>
+  );
+
+  const DistributionForm = () => (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+      <div className="flex flex-col gap-1">
+        <label className="text-[10px] font-semibold text-[#4e7397] uppercase">Beneficiary ID</label>
+        <input name="beneficiary_id" type="number" placeholder="PWD Profile ID" required
+          className="border rounded-xl px-3 py-2.5 text-sm dark:bg-slate-800 dark:border-slate-700 dark:text-white" />
+      </div>
+      <div className="flex flex-col gap-1">
+        <label className="text-[10px] font-semibold text-[#4e7397] uppercase">Item</label>
+        <select name="item_id" required className="border rounded-xl px-3 py-2.5 text-sm dark:bg-slate-800 dark:border-slate-700 dark:text-white">
+          <option value="">— Select Item —</option>
+          {inventoryItems.map(item => (
+            <option key={item.inventory_id} value={item.inventory_id}>{item.item_name} (Stock: {item.quantity})</option>
+          ))}
+        </select>
+      </div>
+      <div className="flex flex-col gap-1">
+        <label className="text-[10px] font-semibold text-[#4e7397] uppercase">Quantity</label>
+        <input name="quantity" type="number" min="1" placeholder="0" required
+          className="border rounded-xl px-3 py-2.5 text-sm dark:bg-slate-800 dark:border-slate-700 dark:text-white" />
+      </div>
+      <div className="flex flex-col gap-1">
+        <label className="text-[10px] font-semibold text-[#4e7397] uppercase">Release Date</label>
+        <input name="release_date" type="date" required
+          className="border rounded-xl px-3 py-2.5 text-sm dark:bg-slate-800 dark:border-slate-700 dark:text-white" />
+      </div>
+      <div className="flex flex-col gap-1">
+        <label className="text-[10px] font-semibold text-[#4e7397] uppercase">Remarks</label>
+        <textarea name="remarks" rows={2} placeholder="Optional notes..."
+          className="border rounded-xl px-3 py-2.5 text-sm resize-none dark:bg-slate-800 dark:border-slate-700 dark:text-white" />
+      </div>
+      <div className="bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-700/30 rounded-xl px-3 py-2.5 text-xs text-yellow-700 dark:text-yellow-400 flex items-center gap-2">
+        <span className="material-symbols-outlined text-sm flex-shrink-0">info</span>
+        Stock will automatically be deducted upon release.
+      </div>
+      <div className="flex justify-end gap-2 mt-2">
+        <button type="button" onClick={() => setModal(false)} className="px-4 py-2.5 border rounded-xl text-sm">Cancel</button>
+        <button type="submit" disabled={submitting} className="px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-bold disabled:opacity-60">
+          {submitting ? "Releasing..." : "Release"}
+        </button>
+      </div>
+    </form>
+  );
+
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex flex-col md:flex-row justify-between gap-3 items-center">
-        <div className="relative flex-1 max-w-md">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#4e7397]">search</span>
-          <input value={search} onChange={e => { setSearch(e.target.value); setCurrentPage(1); }}
-            className="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg focus:ring-2 focus:ring-primary text-sm"
-            placeholder="Search by beneficiary or item..." />
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+        <div className="flex-1">
+          <SearchBar
+            searchValue={search}
+            setSearchValue={(val) => { setSearch(val); setCurrentPage(1); }}
+            filterValue={filterStatus}
+            setFilterValue={(val) => { setFilterStatus(val); setCurrentPage(1); }}
+            placeholder="Search by beneficiary or item..."
+            options={[
+              { value: "all",       label: "All" },
+              { value: "released",  label: "Released" },
+              { value: "pending",   label: "Pending" },
+              { value: "cancelled", label: "Cancelled" },
+            ]}
+          />
         </div>
         <button onClick={() => setModal(true)}
-          className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-md whitespace-nowrap">
-          <span className="material-symbols-outlined">local_shipping</span>Release Assistance
+          className="flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5
+            bg-primary text-white font-bold rounded-xl hover:bg-primary/90
+            transition-colors shadow-md text-xs sm:text-sm whitespace-nowrap flex-shrink-0 h-fit">
+          <span className="material-symbols-outlined text-base">local_shipping</span>
+          <span className="hidden sm:inline">Release Assistance</span>
         </button>
       </div>
 
       {error && <ErrorBanner message={error} />}
 
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-[#d0dbe7] dark:border-slate-800 shadow-sm overflow-x-auto">
-        <table className="w-full text-left border-collapse min-w-[600px]">
-          <thead className="bg-slate-50 dark:bg-slate-800/50">
-            <tr>{["#", "Beneficiary", "Item Released", "Quantity", "Release Date", "Remarks"].map((col, i) => (
-              <th key={i} className="px-5 py-3 text-xs font-bold text-[#4e7397] uppercase tracking-wider text-center">{col}</th>
-            ))}</tr>
-          </thead>
-          <tbody className="divide-y divide-[#e7edf3] dark:divide-slate-800">
-            {loading ? <LoadingRow cols={6} text="Loading distributions..." />
-              : paginated.length === 0 ? <EmptyRow cols={6} text="No distributions recorded yet." />
-              : paginated.map((d, i) => (
-                <tr key={d.assistance_id || i} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                  <td className="px-5 py-3 font-mono text-xs text-primary font-bold text-center">{d.assistance_id}</td>
-                  <td className="px-5 py-3 font-semibold text-[#0e141b] dark:text-white text-sm">{d.full_name || `PWD ID: ${d.beneficiary_id}`}</td>
-                  <td className="px-5 py-3 text-sm">{d.item_name}</td>
-                  <td className="px-5 py-3 text-sm font-medium text-center">{d.quantity}</td>
-                  <td className="px-5 py-3 text-sm text-center">{d.release_date ? new Date(d.release_date).toLocaleDateString() : "—"}</td>
-                  <td className="px-5 py-3 text-sm text-[#4e7397]">{d.remarks || "—"}</td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-        {!loading && <Pagination currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} totalItems={filtered.length} itemsPerPage={itemsPerPage} />}
-      </div>
+      <DataTable
+        columns={["#", "Beneficiary", "Item Released", "Quantity", "Release Date", "Remarks"]}
+        data={paginated} renderRow={renderRow} renderCard={renderCard} empty="No distributions recorded yet."
+        pagination={<Pagination currentPage={currentPage} totalPages={totalPages} totalItems={filtered.length} itemsPerPage={itemsPerPage} onPageChange={(p) => setCurrentPage(p)} />}
+      />
 
       {modal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-xl max-w-md w-full shadow-xl">
-            <h2 className="text-xl font-bold mb-5 flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">local_shipping</span>Release Assistance
-            </h2>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-semibold text-[#4e7397] uppercase">Beneficiary ID</label>
-                <input name="beneficiary_id" type="number" placeholder="PWD Profile ID" required className="border rounded-lg px-3 py-2 text-sm" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-semibold text-[#4e7397] uppercase">Item</label>
-                <select name="item_id" required className="border rounded-lg px-3 py-2 text-sm">
-                  <option value="">— Select Item —</option>
-                  {inventoryItems.map(item => (
-                    <option key={item.inventory_id} value={item.inventory_id}>{item.item_name} (Stock: {item.quantity})</option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-semibold text-[#4e7397] uppercase">Quantity</label>
-                <input name="quantity" type="number" min="1" placeholder="0" required className="border rounded-lg px-3 py-2 text-sm" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-semibold text-[#4e7397] uppercase">Release Date</label>
-                <input name="release_date" type="date" required className="border rounded-lg px-3 py-2 text-sm" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-semibold text-[#4e7397] uppercase">Remarks</label>
-                <textarea name="remarks" rows={2} placeholder="Optional notes..." className="border rounded-lg px-3 py-2 text-sm resize-none" />
-              </div>
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2 text-xs text-yellow-700 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[16px]">info</span>
-                Stock will automatically be deducted upon release.
-              </div>
-              <div className="flex justify-end gap-2 mt-2">
-                <button type="button" onClick={() => setModal(false)} className="px-4 py-2 border rounded-lg text-sm">Cancel</button>
-                <button type="submit" disabled={submitting} className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold disabled:opacity-60">
-                  {submitting ? "Releasing..." : "Release"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <AddEditModal isOpen isEdit={false} title="Assistance" icon="local_shipping" onCancel={() => setModal(false)}>
+          <DistributionForm />
+        </AddEditModal>
       )}
     </div>
   );
@@ -492,8 +700,6 @@ const AdminInventoryPage = () => {
   const [inventoryLoading, setInventoryLoading] = useState(true);
   const [inventoryError, setInventoryError] = useState(null);
 
-  // Inventory is fetched here at the top level so Donations & Distribution
-  // tabs can share the same list without extra network calls
   const fetchInventory = async () => {
     try {
       setInventoryLoading(true);
@@ -507,84 +713,53 @@ const AdminInventoryPage = () => {
 
   useEffect(() => { fetchInventory(); }, []);
 
-  // Stats
-  const totalItems = inventoryItems.length;
-  const outOfStock = inventoryItems.filter(i => i.quantity === 0).length;
-  const lowStock = inventoryItems.filter(i => i.quantity > 0 && i.quantity <= (i.low_stock_threshold || 5)).length;
+  const statsdata = [
+    { label: "Total Items",  icon: "inventory", value: inventoryItems.length, change: "", changeText: "in stock",        changeClass: "text-emerald-600" },
+    { label: "Low Stock",    icon: "warning",   value: inventoryItems.filter(i => i.quantity > 0 && i.quantity <= (i.low_stock_threshold || 5)).length, change: "", changeText: "need restocking", changeClass: "text-yellow-600" },
+    { label: "Out of Stock", icon: "block",     value: inventoryItems.filter(i => i.quantity === 0).length, change: "", changeText: "unavailable", changeClass: "text-red-600" },
+  ];
 
   const tabs = [
-    { key: "inventory", label: "Inventory", icon: "inventory" },
-    { key: "donations", label: "Donations", icon: "volunteer_activism" },
+    { key: "inventory",    label: "Inventory",    icon: "inventory" },
+    { key: "donations",    label: "Donations",    icon: "volunteer_activism" },
     { key: "distribution", label: "Distribution", icon: "local_shipping" },
   ];
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto flex flex-col gap-8">
-
-      {/* Header */}
+    <div className="px-3 sm:px-4 md:px-8 py-4 sm:py-6 md:py-8 w-full flex flex-col gap-4 sm:gap-6 md:gap-8">
       <div className="flex flex-col gap-1">
-        <h1 className="text-[#0e141b] dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-tight">
+        <h1 className="text-[#0e141b] dark:text-white text-xl sm:text-3xl md:text-4xl font-black leading-tight tracking-tight">
           Inventory & Donations
         </h1>
-        <p className="text-[#4e7397] dark:text-slate-400 text-sm md:text-lg">
+        <p className="text-[#4e7397] dark:text-slate-400 text-xs sm:text-sm md:text-base">
           Manage medical supplies, track donations, and release assistance to PWD beneficiaries.
         </p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        {[
-          { label: "Total Items", icon: "inventory", value: totalItems, sub: "in database", color: "emerald" },
-          { label: "Low Stock", icon: "warning", value: lowStock, sub: "items need restocking", color: "yellow" },
-          { label: "Out of Stock", icon: "block", value: outOfStock, sub: "items unavailable", color: "red" },
-        ].map((s, i) => (
-          <div key={i} className="flex flex-col gap-2 rounded-xl p-5 border border-[#d0dbe7] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-            <div className="flex justify-between items-start">
-              <p className="text-[#4e7397] dark:text-slate-400 text-xs font-bold uppercase tracking-wider">{s.label}</p>
-              <span className={`material-symbols-outlined text-${s.color}-500`}>{s.icon}</span>
-            </div>
-            <p className="text-[#0e141b] dark:text-white text-3xl font-black">{inventoryLoading ? "—" : s.value}</p>
-            <p className="text-[#4e7397] dark:text-slate-500 text-xs">{s.sub}</p>
-          </div>
+      <StatsGrid>
+        {statsdata.map((stat, idx) => (
+          <StatsCards key={idx} stat={stat} />
         ))}
-      </div>
+      </StatsGrid>
 
-      {/* Tabs */}
-      <div className="flex gap-1 border-b border-[#e7edf3] dark:border-slate-800">
+      <div className="flex border-b border-[#e7edf3] dark:border-slate-800 overflow-x-auto">
         {tabs.map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center gap-2 px-5 py-3 text-sm font-bold transition-all border-b-2 -mb-px ${
+            className={`flex items-center gap-1.5 px-3 sm:px-4 md:px-5 py-2.5 sm:py-3
+              text-xs sm:text-sm font-bold transition-all border-b-2 -mb-px whitespace-nowrap flex-shrink-0 ${
               activeTab === tab.key
                 ? "border-primary text-primary"
                 : "border-transparent text-[#4e7397] hover:text-[#0e141b] dark:hover:text-white"
             }`}>
-            <span className="material-symbols-outlined text-[20px]">{tab.icon}</span>
+            <span className="material-symbols-outlined text-base">{tab.icon}</span>
             {tab.label}
           </button>
         ))}
       </div>
 
-      {/* Tab Content */}
-      {activeTab === "inventory" && (
-        <InventoryTab
-          inventoryItems={inventoryItems}
-          loading={inventoryLoading}
-          error={inventoryError}
-          onRefresh={fetchInventory}
-        />
-      )}
-      {activeTab === "donations" && (
-        <DonationsTab
-          inventoryItems={inventoryItems}
-          onInventoryRefresh={fetchInventory}
-        />
-      )}
-      {activeTab === "distribution" && (
-        <DistributionTab
-          inventoryItems={inventoryItems}
-          onInventoryRefresh={fetchInventory}
-        />
-      )}
+      {activeTab === "inventory"    && <InventoryTab    inventoryItems={inventoryItems} loading={inventoryLoading} error={inventoryError} onRefresh={fetchInventory} />}
+      {activeTab === "donations"    && <DonationsTab    inventoryItems={inventoryItems} onInventoryRefresh={fetchInventory} />}
+      {activeTab === "distribution" && <DistributionTab inventoryItems={inventoryItems} onInventoryRefresh={fetchInventory} />}
     </div>
   );
 };

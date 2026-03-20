@@ -47,27 +47,27 @@ const UserAnnouncements = () => {
   }, [announcements.length]);
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 sm:p-6 lg:p-8">
+    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-3 sm:p-4 md:p-6 lg:p-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
+        <h3 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white">
           Announcements
         </h3>
-        <button className="text-blue-600 text-sm sm:text-base font-bold hover:underline">
+        <button className="text-primary text-xs sm:text-sm md:text-base font-bold hover:underline whitespace-nowrap">
           View All
         </button>
       </div>
 
       {/* Announcements List */}
-      <div className="space-y-3 max-h-96 overflow-y-auto">
+      <div className="space-y-2.5 sm:space-y-3 md:space-y-4 max-h-96 overflow-y-auto">
         {announcements.map((ann) => (
           <div
             key={ann.id}
-            className="flex gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border border-slate-100 dark:border-slate-800"
+            className="flex gap-2.5 sm:gap-3 md:gap-4 p-2.5 sm:p-3 md:p-4 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border border-slate-100 dark:border-slate-800"
           >
             {/* Icon */}
             <div
-              className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shrink-0 text-lg sm:text-xl font-medium ${
+              className={`w-9 sm:w-10 md:w-12 h-9 sm:h-10 md:h-12 rounded-full flex items-center justify-center shrink-0 text-base sm:text-lg md:text-xl font-medium ${
                 ann.important
                   ? "bg-red-100 text-red-600"
                   : "bg-blue-100 text-blue-600"
@@ -79,14 +79,14 @@ const UserAnnouncements = () => {
             </div>
 
             {/* Text */}
-            <div className="flex-1 flex flex-col">
-              <p className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+            <div className="flex-1 flex flex-col gap-1 sm:gap-1.5">
+              <p className="text-xs sm:text-sm md:text-base font-bold text-slate-900 dark:text-white leading-tight">
                 {ann.title}
               </p>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+              <p className="text-[10px] sm:text-xs md:text-sm text-slate-500 dark:text-slate-400">
                 {ann.desc}
               </p>
-              <span className="text-[10px] sm:text-xs text-slate-400 mt-1">
+              <span className="text-[8px] sm:text-[10px] md:text-xs text-slate-400 mt-0.5">
                 {timeAgo(ann.timestamp)}
               </span>
             </div>

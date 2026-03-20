@@ -22,49 +22,59 @@ const AdminSms = () => {
     <div>
       <main className="flex-1 flex flex-col overflow-y-auto">
         {/* Page Content */}
-        <div className="p-4 md:p-8 max-w-7xl mx-auto w-full flex flex-col gap-6">
+        <div className="p-3 sm:p-4 md:p-8 max-w-7xl mx-auto w-full flex flex-col gap-4 sm:gap-6 md:gap-8">
           {/* Heading + Compose Button */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div className="flex flex-col gap-1">
-              <h1 className="text-[#0e141b] dark:text-white text-2xl md:text-4xl font-black leading-tight tracking-tight">SMS Notifications</h1>
-              <p className="text-[#4e7397] dark:text-slate-400 text-sm md:text-base max-w-2xl">Manage and monitor automated and manual broadcasts to PWD members in Barangay Trapiche.</p>
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 md:gap-6">
+            <div className="flex flex-col gap-1 sm:gap-2 min-w-0">
+              <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white leading-tight tracking-tight">
+                SMS Notifications
+              </h1>
+              <p className="text-xs sm:text-sm md:text-base text-slate-600 dark:text-slate-400 max-w-2xl">
+                Manage and monitor automated and manual broadcasts to PWD members in Barangay Trapiche.
+              </p>
             </div>
-            <button className="flex items-center gap-2 rounded-xl h-10 md:h-12 px-4 md:px-6 bg-primary text-white text-sm md:text-base font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
-              <span className="material-symbols-outlined">send</span>
-              <span>Compose Message</span>
+            <button className="flex items-center gap-2 rounded-xl h-10 sm:h-11 md:h-12 px-4 sm:px-5 md:px-6 bg-primary text-white text-xs sm:text-sm md:text-base font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all touch-target whitespace-nowrap">
+              <span className="material-symbols-outlined text-lg md:text-xl">send</span>
+              <span>Compose</span>
             </button>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
             {[
               { label: "Total Sent Today", value: "1,284", icon: "outbox", extra: "+12.5% from yesterday", color: "green-600", trendIcon: "trending_up" },
               { label: "Pending Queue", value: "12", icon: "pending_actions", extra: "Currently in processing", color: "amber-600" },
               { label: "Failed Deliveries", value: "5", icon: "error", extra: "Requires attention", color: "red-600" },
             ].map((stat, idx) => (
-              <div key={idx} className="flex flex-col gap-2 rounded-xl p-4 md:p-6 bg-white dark:bg-slate-800 border border-[#d0dbe7] dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
+              <div key={idx} className="flex flex-col gap-2 rounded-xl p-3 sm:p-4 md:p-6 bg-white dark:bg-slate-800 border border-[#d0dbe7] dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between">
-                  <p className="text-[#4e7397] dark:text-slate-400 text-xs md:text-sm font-semibold uppercase tracking-wider">{stat.label}</p>
-                  <span className={`material-symbols-outlined text-${stat.color}`}>{stat.icon}</span>
+                  <p className="text-[10px] sm:text-xs md:text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">{stat.label}</p>
+                  <span className={`material-symbols-outlined text-lg sm:text-xl text-${stat.color}`}>{stat.icon}</span>
                 </div>
-                <p className="text-[#0e141b] dark:text-white text-2xl md:text-3xl font-bold leading-tight">{stat.value}</p>
+                <p className="text-lg sm:text-2xl md:text-3xl font-bold text-slate-900 dark:text-white leading-tight">{stat.value}</p>
                 {stat.trendIcon ? (
-                  <p className={`flex items-center gap-1 text-[${stat.color}] text-sm font-bold`}>
-                    <span className="material-symbols-outlined text-[16px]">{stat.trendIcon}</span>
+                  <p className={`flex items-center gap-1 text-${stat.color} text-xs sm:text-sm font-bold`}>
+                    <span className="material-symbols-outlined text-sm md:text-base">{stat.trendIcon}</span>
                     <span>{stat.extra}</span>
                   </p>
-                ) : <p className="text-[#4e7397] dark:text-slate-500 text-sm font-medium">{stat.extra}</p>}
+                ) : <p className="text-slate-600 dark:text-slate-500 text-xs sm:text-sm font-medium">{stat.extra}</p>}
               </div>
             ))}
           </div>
 
           {/* Tabs + Table */}
           <div className="bg-white dark:bg-slate-800 rounded-xl border border-[#d0dbe7] dark:border-slate-700 shadow-sm overflow-hidden">
-            <div className="sticky top-0 z-10 bg-white dark:bg-slate-800 border-b border-[#d0dbe7] dark:border-slate-700 px-4 md:px-6 py-2 md:py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 md:gap-0">
+            <div className="sticky top-0 z-10 bg-white dark:bg-slate-800 border-b border-[#d0dbe7] dark:border-slate-700 px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 flex flex-col gap-2 sm:gap-0 sm:flex-row sm:items-center sm:justify-between">
               {/* Tabs */}
-              <div className="flex gap-2 md:gap-8 overflow-x-auto whitespace-nowrap">
+              <div className="flex gap-1 sm:gap-2 md:gap-8 overflow-x-auto whitespace-nowrap scrollbar-hide">
                 {["Message History", "Scheduled", "Templates"].map((tab, idx) => (
-                  <a key={idx} className={`border-b-2 py-2 px-2 text-sm font-bold flex items-center gap-1 md:gap-2 ${idx === 0 ? "border-primary text-[#0e141b] dark:text-white" : "border-transparent text-[#4e7397] dark:text-slate-400 hover:text-primary transition-colors"}`} href="#">{tab}</a>
+                  <a key={idx} className={`border-b-2 py-2 px-2 sm:px-1 md:px-2 text-xs sm:text-sm font-bold flex items-center gap-0.5 sm:gap-1 md:gap-2 transition-colors ${
+                    idx === 0
+                      ? "border-primary text-slate-900 dark:text-white"
+                      : "border-transparent text-slate-600 dark:text-slate-400 hover:text-primary"
+                  }`} href="#">
+                    {tab}
+                  </a>
                 ))}
               </div>
 
@@ -141,16 +151,18 @@ const AdminSms = () => {
             </div>
 
             {/* Pagination */}
-            <div className="px-4 md:px-6 py-3 border-t border-[#d0dbe7] dark:border-slate-700 flex flex-wrap items-center justify-between gap-2">
-              <p className="text-sm text-[#4e7397] dark:text-slate-400 font-medium">
+            <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-t border-[#d0dbe7] dark:border-slate-700 flex flex-col gap-2 sm:gap-0 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+              <p className="text-[10px] sm:text-xs md:text-sm text-slate-600 dark:text-slate-400 font-medium order-2 sm:order-1">
                 Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, dummyMessages.length)} of {dummyMessages.length} messages
               </p>
-              <div className="flex flex-wrap gap-2">
-                <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1} className="px-3 py-1.5 rounded-lg border border-[#d0dbe7] dark:border-slate-600 text-[#4e7397] dark:text-slate-400 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50">Previous</button>
+              <div className="flex flex-wrap gap-1.5 sm:gap-2 order-1 sm:order-2">
+                <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1} className="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-[#d0dbe7] dark:border-slate-600 text-slate-600 dark:text-slate-400 text-xs sm:text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 touch-target">Previous</button>
                 {Array.from({ length: totalPages }, (_, i) => (
-                  <button key={i + 1} onClick={() => goToPage(i + 1)} className={`px-3 py-1.5 rounded-lg text-sm font-bold ${currentPage === i + 1 ? "bg-primary text-white" : "border border-[#d0dbe7] dark:border-slate-600 text-[#4e7397] dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700"}`}>{i + 1}</button>
+                  <button key={i + 1} onClick={() => goToPage(i + 1)} className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold ${
+                    currentPage === i + 1 ? "bg-primary text-white" : "border border-[#d0dbe7] dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700"
+                  }`}>{i + 1}</button>
                 ))}
-                <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages} className="px-3 py-1.5 rounded-lg border border-[#d0dbe7] dark:border-slate-600 text-[#4e7397] dark:text-slate-400 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50">Next</button>
+                <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages} className="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-[#d0dbe7] dark:border-slate-600 text-slate-600 dark:text-slate-400 text-xs sm:text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 touch-target">Next</button>
               </div>
             </div>
           </div>
