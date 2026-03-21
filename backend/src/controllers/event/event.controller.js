@@ -104,3 +104,16 @@ exports.deleteEvent = (req, res) => {
     }
   );
 };
+
+exports.getUpcomingEvents = (req, res) => {
+  const sql = `
+    SELECT * FROM events
+    WHERE status IN ('Scheduled', 'Upcoming')
+    AND event_date >= CURDATE()
+    ORDER BY event_date ASC
+  `;
+  db.query(sql, (err, result) => {
+    if (err) return res.status(500).json(err);
+    res.json(result);
+  });
+};
