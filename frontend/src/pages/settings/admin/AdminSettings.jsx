@@ -566,7 +566,7 @@
 import { useParams }    from "react-router-dom";
 import UserList          from "./UserList";           // ← same folder
 import AccessRequests    from "./AccessRequests";     // ← same folder
-import { RolesPermissions, PendingInvitations } from "./PlaceholderTabs"; // ← same folder
+import { RolesPermissions, PendingInvitations } from "./Placeholdertabs";
 import ProfileSettings   from "../profileSettings";  // ← 1 level up
 import useToast          from "../../../hooks/useToast"; // ← 2 levels up
 import { ToastContainer } from "../../../components/ui/Toast"; // ← 2 levels up
