@@ -66,7 +66,7 @@ const App = () => {
             </ProtectedRoute>
           } />
 
-          <Route path="/PagesSettings" element={
+          <Route path="/PagesSettings/:tab?" element={
             <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.STAFF, ROLES.USER]}>
               <PagesSettings />
             </ProtectedRoute>

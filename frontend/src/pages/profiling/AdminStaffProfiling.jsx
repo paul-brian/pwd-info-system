@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { ToastContainer } from "../../components/ui/Toast";
 import axios from "axios";
 import API_URL from "../../api/api";
 import StatsCards from "../../components/ui/StatsCards";
@@ -10,6 +11,7 @@ import SearchBar from "../../components/ui/SearchBar";
 import AddEditModal from "../../components/modals/AddEditModal";
 import DeleteModal from "../../components/modals/DeleteModal";
 import ViewModal from "../../components/modals/ViewModal";
+import useToast from "../../hooks/useToast";
 
 const API_BASE = `${API_URL}/api/pwd`;
 
@@ -25,7 +27,7 @@ const AdminProfiling = () => {
   const [modal, setModal] = useState({ type: null, data: null });
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [toast, setToast] = useState({ message: "", type: "success", visible: false });
+  const { toasts, showToast, removeToast } = useToast();
   const itemsPerPage = 6;
 
   const fetchPWDs = async () => {
@@ -58,14 +60,14 @@ const AdminProfiling = () => {
   useEffect(() => { fetchPWDs(); }, []);
 
   // ── Filter & Paginate ──
-const filteredPWDs = PWDs.filter((p) =>
-  (filterStatus === "all" || p.status === filterStatus) &&
-  (
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.pwd_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.address.toLowerCase().includes(searchTerm.toLowerCase())
-  )
-);
+  const filteredPWDs = PWDs.filter((p) =>
+    (filterStatus === "all" || p.status === filterStatus) &&
+    (
+      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.pwd_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.address.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
   const totalPages = Math.max(1, Math.ceil(filteredPWDs.length / itemsPerPage));
   const paginatedPWDs = filteredPWDs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const goToPage = (page) => { if (page < 1 || page > totalPages) return; setCurrentPage(page); };
@@ -74,11 +76,6 @@ const filteredPWDs = PWDs.filter((p) =>
   const openModal = (type, data = null) => setModal({ type, data });
   const closeModal = () => setModal({ type: null, data: null });
 
-  // ── Toast ──
-  const showToast = (message, type = "success") => {
-    setToast({ message, type, visible: true });
-    setTimeout(() => setToast((t) => ({ ...t, visible: false })), 3000);
-  };
 
   // ── CRUD ──
   const handleAdd = async (form) => {
@@ -211,18 +208,15 @@ const filteredPWDs = PWDs.filter((p) =>
       </div>
       <div className="flex gap-2 pt-2.5 border-t border-slate-200 dark:border-slate-700">
         <button onClick={() => openModal('view', pwd)} className="flex-1 flex items-center justify-center gap-1.5 p-2 sm:p-2.5 text-slate-600 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all text-xs sm:text-sm">
-          <span className="material-symbols-outlined text-base sm:text-lg">visibility</span>
-          <span className="hidden sm:inline">View</span>
+          <span className="font-bold text-sm">View</span>
         </button>
         <button onClick={() => pwd.canEdit && openModal('edit', pwd)} disabled={!pwd.canEdit}
           className={`flex-1 flex items-center justify-center gap-1.5 p-2 sm:p-2.5 rounded-lg transition-all text-xs sm:text-sm ${pwd.canEdit ? 'text-slate-600 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20' : 'text-slate-200 cursor-not-allowed'}`}>
-          <span className="material-symbols-outlined text-base sm:text-lg">edit</span>
-          <span className="hidden sm:inline">Edit</span>
+          <span className="font-bold text-sm">Edit</span>
         </button>
         <button onClick={() => pwd.canEdit && openModal('delete', pwd)} disabled={!pwd.canEdit}
           className={`flex-1 flex items-center justify-center gap-1.5 p-2 sm:p-2.5 rounded-lg transition-all text-xs sm:text-sm ${pwd.canEdit ? 'text-slate-600 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20' : 'text-slate-200 cursor-not-allowed'}`}>
-          <span className="material-symbols-outlined text-base sm:text-lg">delete</span>
-          <span className="hidden sm:inline">Delete</span>
+          <span className="font-bold text-sm">Delete</span>
         </button>
       </div>
     </div>
@@ -339,18 +333,7 @@ const filteredPWDs = PWDs.filter((p) =>
       )}
 
       {/* ── Toast ── */}
-      {toast.visible && (
-        <div className={`fixed bottom-4 sm:bottom-6 left-4 right-4 sm:left-auto sm:right-6 z-50
-          px-4 sm:px-6 py-3 sm:py-3.5 rounded-xl shadow-2xl text-white font-medium
-          flex items-center gap-2 sm:gap-3 border text-sm sm:text-base
-          ${toast.type === "success"
-            ? "bg-gradient-to-r from-emerald-500 to-emerald-600 border-emerald-400/30 shadow-emerald-500/20"
-            : "bg-gradient-to-r from-red-500 to-red-600 border-red-400/30 shadow-red-500/20"
-          }`}>
-          <span className="material-symbols-outlined text-lg flex-shrink-0">{toast.type === "success" ? "check_circle" : "error"}</span>
-          <span className="flex-1">{toast.message}</span>
-        </div>
-      )}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 };

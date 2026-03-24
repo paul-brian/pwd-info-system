@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { ToastContainer } from "../../components/ui/Toast";
 import API_URL from "../../api/api";
 import axios from "axios";
 import StatsCards from "../../components/ui/StatsCards";
@@ -9,7 +10,9 @@ import SearchBar from "../../components/ui/SearchBar";
 import AddEditModal from "../../components/modals/AddEditModal";
 import DeleteModal from "../../components/modals/DeleteModal";
 import ViewModal from "../../components/modals/ViewModal";
-import Modal from "../../components/modals/Modal"; // ← para sa Attendance modal (wide)
+import Modal from "../../components/modals/Modal"; 
+import useToast from "../../hooks/useToast";
+
 
 const EVENT_API = `${API_URL}/api/events`;
 const ATT_API   = `${API_URL}/api/attendance`;
@@ -27,10 +30,10 @@ export default function EventAttendance() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [modal, setModal]                 = useState({ type: null, data: null });
   const [currentPage, setCurrentPage]     = useState(1);
-  const itemsPerPage = 6;
-
+  const { toasts, showToast, removeToast } = useToast();
   const [search, setSearch]               = useState("");
   const [filterStatus, setFilterStatus]   = useState("all");
+  const itemsPerPage = 6;
 
   const closeModal = () => setModal({ type: null, data: null });
 
@@ -59,7 +62,9 @@ export default function EventAttendance() {
     try {
       const res = await axios.get(`${ATT_API}/${event.id}`);
       setAttendance(res.data);
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+      console.error(err); 
+    }
   };
 
   const markAttendance = async (pwd_id, status) => {
@@ -67,7 +72,11 @@ export default function EventAttendance() {
       await axios.post(`${ATT_API}/mark`, { event_id: selectedEvent.id, pwd_id, status });
       setAttendance((prev) => prev.map((u) => (u.pwd_id === pwd_id ? { ...u, status } : u)));
       fetchEvents();
-    } catch (err) { console.error(err); }
+      showToast("PWD attendance successfully!", "success");
+    } catch (err) { 
+      console.error(err); 
+      showToast("Failed to mark attendance!", "error");
+    }
   };
 
   // ── Event CRUD ──
@@ -89,7 +98,11 @@ export default function EventAttendance() {
       else await axios.post(EVENT_API, payload);
       fetchEvents();
       closeModal();
-    } catch (err) { console.error(err); }
+      showToast("Event created successfully!", "success");
+    } catch (err) { 
+      console.error(err); 
+      showToast("Failed to create event.", "error");
+    }
   };
 
   const handleDelete = async () => {
@@ -97,7 +110,11 @@ export default function EventAttendance() {
       await axios.delete(`${EVENT_API}/${modal.data.id}`);
       fetchEvents();
       closeModal();
-    } catch (err) { console.error(err); }
+      showToast("Event deleted successfully!", "success");
+    } catch (err) {
+       console.error(err); 
+       showToast("Failed to delete event.", "error");
+      }
   };
 
   // ── Filter & Paginate ──
@@ -152,7 +169,7 @@ export default function EventAttendance() {
         <td className="px-4 lg:px-5 py-3 lg:py-4">
           <button onClick={() => openAttendance(ev)}
             className="text-xs font-bold text-primary hover:text-primary/80 hover:underline transition-colors">
-            View
+            Attendance
           </button>
         </td>
         <td className="px-4 lg:px-5 py-3 lg:py-4">
@@ -219,23 +236,19 @@ export default function EventAttendance() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-2.5 border-t border-slate-200 dark:border-slate-700">
           <button onClick={() => openAttendance(ev)}
             className="flex items-center justify-center gap-1 p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors text-[10px] font-semibold">
-            <span className="material-symbols-outlined text-sm">how_to_reg</span>
-            <span>Attendance</span>
+            <span className="font-bold ">Attendance</span>
           </button>
           <button onClick={() => setModal({ type: "view", data: ev })}
             className="flex items-center justify-center gap-1 p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors text-[10px]">
-            <span className="material-symbols-outlined text-sm">visibility</span>
-            <span>View</span>
+            <span className="font-bold ">View</span>
           </button>
           <button onClick={() => setModal({ type: "edit", data: ev })}
             className="flex items-center justify-center gap-1 p-2 text-slate-600 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg transition-colors text-[10px]">
-            <span className="material-symbols-outlined text-sm">edit</span>
-            <span>Edit</span>
+            <span className="font-bold ">Edit</span>
           </button>
           <button onClick={() => setModal({ type: "delete", data: ev })}
             className="flex items-center justify-center gap-1 p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors text-[10px]">
-            <span className="material-symbols-outlined text-sm">delete</span>
-            <span>Delete</span>
+            <span className="font-bold ">Delete</span>
           </button>
         </div>
       </div>
@@ -443,6 +456,9 @@ export default function EventAttendance() {
           onCancel={closeModal}
         />
       )}
+
+      {/* ── Toast ── */}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 }

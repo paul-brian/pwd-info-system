@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import AdminSettings from "../settings/AdminSettings"; // existing UI
+import AdminSettings from "./admin/AdminSettings"; // existing UI
 import UserSettings from '../settings/UserSettings';
 import StaffSettings from './StaffSettings';
 import { ROLES } from '../Auth/roles';

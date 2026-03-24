@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { ToastContainer } from "../../components/ui/Toast";
 import API_URL from "../../api/api";
 import StatsCards from "../../components/ui/StatsCards";
 import StatsGrid from "../../components/ui/StatsGrid";
@@ -8,6 +9,7 @@ import SearchBar from "../../components/ui/SearchBar";
 import AddEditModal from "../../components/modals/AddEditModal";
 import DeleteModal from "../../components/modals/DeleteModal";
 import ViewModal from "../../components/modals/ViewModal";
+import useToast from "../../hooks/useToast";
 
 const API_BASE = `${API_URL}/api`;
 
@@ -28,12 +30,6 @@ const StatusBadge = ({ qty, threshold }) => {
   );
 };
 
-const ErrorBanner = ({ message }) => (
-  <div className="flex items-start gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-xs sm:text-sm">
-    <span className="material-symbols-outlined text-base flex-shrink-0 mt-0.5">error</span>
-    <span>{message} — Make sure your backend is running on port 5000.</span>
-  </div>
-);
 
 // ─── INVENTORY TAB ─────────────────────────────────────────────────────────────
 const InventoryTab = ({ inventoryItems, loading, error, onRefresh }) => {
@@ -41,7 +37,8 @@ const InventoryTab = ({ inventoryItems, loading, error, onRefresh }) => {
   const [filterStatus, setFilterStatus] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [modal, setModal] = useState({ type: null, item: null });
-  const itemsPerPage = 5;
+  const { toasts, showToast, removeToast } = useToast();
+  const itemsPerPage = 6;
 
   const filtered = inventoryItems.filter(item => {
     const matchStatus =
@@ -73,7 +70,10 @@ const InventoryTab = ({ inventoryItems, loading, error, onRefresh }) => {
       if (!res.ok) throw new Error("Failed to save item");
       await onRefresh();
       setModal({ type: null, item: null });
-    } catch (err) { alert(err.message); }
+      showToast(modal.type === "add" ? "Item added successfully!" : "Item updated successfully!", "success");
+    } catch (err) { 
+      showToast(err.message || "Failed to save item.", "error");
+    }
   };
 
   const handleDelete = async () => {
@@ -82,7 +82,10 @@ const InventoryTab = ({ inventoryItems, loading, error, onRefresh }) => {
       if (!res.ok) throw new Error("Failed to delete item");
       await onRefresh();
       setModal({ type: null, item: null });
-    } catch (err) { alert(err.message); }
+      showToast("Item deleted successfully!", "success");
+    } catch (err) { 
+      showToast(err.message || "Failed to delete item.", "error");
+    }
   };
 
   const renderRow = (item) => (
@@ -219,6 +222,7 @@ const InventoryTab = ({ inventoryItems, loading, error, onRefresh }) => {
         <DeleteModal title="Delete Item" message="Are you sure you want to delete" subject={modal.item.item_name} confirmText="Delete"
           onConfirm={handleDelete} onCancel={() => setModal({ type: null, item: null })} />
       )}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 };
@@ -227,13 +231,14 @@ const InventoryTab = ({ inventoryItems, loading, error, onRefresh }) => {
 const DonationsTab = ({ inventoryItems, onInventoryRefresh }) => {
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { toasts, showToast, removeToast } = useToast();
   const [error, setError] = useState(null);
   const [modal, setModal] = useState({ type: null, data: null });
   const [submitting, setSubmitting] = useState(false);
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 6;
 
   const fetchDonations = async () => {
     try {
@@ -271,9 +276,11 @@ const DonationsTab = ({ inventoryItems, onInventoryRefresh }) => {
       if (!res.ok) throw new Error("Failed to record donation");
       await fetchDonations();
       await onInventoryRefresh();
+      showToast("Donation recorded successfully!", "success");
       closeModal();
-    } catch (err) { alert(err.message); }
-    finally { setSubmitting(false); }
+    } catch (err) { 
+      showToast(err.message || "Failed to record donation.", "error");  
+    } finally { setSubmitting(false); }
   };
 
   // ── Edit ──
@@ -297,9 +304,11 @@ const DonationsTab = ({ inventoryItems, onInventoryRefresh }) => {
       if (!res.ok) throw new Error("Failed to update donation");
       await fetchDonations();
       await onInventoryRefresh();
+      showToast("Donation updated successfully!", "success");
       closeModal();
-    } catch (err) { alert(err.message); }
-    finally { setSubmitting(false); }
+    } catch (err) {  
+      showToast(err.message || "Failed to update donation.", "error");
+    } finally { setSubmitting(false); }
   };
 
   // ── Delete ──
@@ -312,9 +321,11 @@ const DonationsTab = ({ inventoryItems, onInventoryRefresh }) => {
       if (!res.ok) throw new Error("Failed to delete donation");
       await fetchDonations();
       await onInventoryRefresh();
+      
       closeModal();
-    } catch (err) { alert(err.message); }
-    finally { setSubmitting(false); }
+    } catch (err) { 
+      showToast(err.message || "Failed to delete donation.", "error"); 
+    } finally { setSubmitting(false); }
   };
 
   const filtered = donations.filter(d => {
@@ -516,6 +527,9 @@ const DonationsTab = ({ inventoryItems, onInventoryRefresh }) => {
           onCancel={closeModal}
         />
       )}
+
+      {/* ── Toast ── */}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 };
@@ -524,13 +538,14 @@ const DonationsTab = ({ inventoryItems, onInventoryRefresh }) => {
 const DistributionTab = ({ inventoryItems, onInventoryRefresh }) => {
   const [distributions, setDistributions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { toasts, showToast, removeToast } = useToast();
   const [error, setError] = useState(null);
   const [modal, setModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 6;
 
   const fetchDistributions = async () => {
     try {
@@ -563,8 +578,10 @@ const DistributionTab = ({ inventoryItems, onInventoryRefresh }) => {
       await fetchDistributions();
       await onInventoryRefresh();
       setModal(false);
-    } catch (err) { alert(err.message); }
-    finally { setSubmitting(false); }
+      showToast("Assistance released successfully!", "success");
+    } catch (err) { 
+      showToast(err.message || "Failed to release assistance.", "error"); 
+    } finally { setSubmitting(false); }
   };
 
   const filtered = distributions.filter(d => {
@@ -689,6 +706,9 @@ const DistributionTab = ({ inventoryItems, onInventoryRefresh }) => {
           <DistributionForm />
         </AddEditModal>
       )}
+
+      {/* ── Toast ── */}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { ToastContainer } from "../../components/ui/Toast";
 import API_URL from "../../api/api";
 import axios from "axios";
 import StatsCards from "../../components/ui/StatsCards";
@@ -9,6 +10,7 @@ import SearchBar from "../../components/ui/SearchBar";
 import AddEditModal from "../../components/modals/AddEditModal";
 import DeleteModal from "../../components/modals/DeleteModal";
 import ViewModal from "../../components/modals/ViewModal";
+import useToast from "../../hooks/useToast";
 
 const API_BASE = `${API_URL}/api/health`;
 
@@ -43,22 +45,21 @@ const statusColors = {
 const AdminHealthRecords = () => {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { toasts, showToast, removeToast } = useToast();
   const [currentPage, setCurrentPage] = useState(1);
   const [modal, setModal] = useState({ type: null, record: null });
   const [submitting, setSubmitting] = useState(false);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-  const itemsPerPage = 8;
+  const itemsPerPage = 6;
 
   const fetchRecords = async () => {
     setLoading(true);
-    setError(null);
     try {
       const { data } = await axios.get(API_BASE);
       setRecords(data.map(mapRecord));
     } catch (err) {
-      setError(err.response?.data?.message || err.message);
+      showToast(err.response?.data?.message || err.message, "error");
     } finally {
       setLoading(false);
     }
@@ -105,8 +106,9 @@ const AdminHealthRecords = () => {
       await axios.delete(`${API_BASE}/${modal.record.id}`);
       closeModal();
       fetchRecords();
+      showToast("Health record deleted successfully!", "success");
     } catch (err) {
-      alert(err.response?.data?.message || err.message);
+      showToast("Failed to delete health record.", "error");
     } finally {
       setSubmitting(false);
     }
@@ -156,18 +158,18 @@ const AdminHealthRecords = () => {
         {record.remarks || "—"}
       </td>
       <td className="px-4 lg:px-5 2xl:px-6 py-3 lg:py-4 text-sm text-[#4e7397] whitespace-nowrap">{record.date}</td>
-      <td className="px-4 lg:px-5 2xl:px-6 py-3 lg:py-4">
-        <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      <td className="px-4 lg:px-5 py-3 lg:py-4">
+        <div className="flex gap-1">
           <button onClick={() => setModal({ type: "view", record })}
-            className="p-1.5 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors text-[#4e7397]">
+            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
             <span className="material-symbols-outlined text-lg lg:text-xl">visibility</span>
           </button>
           <button onClick={() => setModal({ type: "edit", record })}
-            className="p-1.5 hover:bg-primary/10 hover:text-primary rounded-lg transition-colors text-[#4e7397]">
+            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
             <span className="material-symbols-outlined text-lg lg:text-xl">edit</span>
           </button>
           <button onClick={() => setModal({ type: "delete", record })}
-            className="p-1.5 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-[#4e7397]">
+            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
             <span className="material-symbols-outlined text-lg lg:text-xl">delete</span>
           </button>
         </div>
@@ -204,18 +206,15 @@ const AdminHealthRecords = () => {
       <div className="flex gap-2 pt-2.5 border-t border-[#e7edf3] dark:border-slate-800">
         <button onClick={() => setModal({ type: "view", record })}
           className="flex-1 flex items-center justify-center gap-1.5 p-2 text-[#4e7397] hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-xs sm:text-sm">
-          <span className="material-symbols-outlined text-base">visibility</span>
-          <span className="hidden sm:inline">View</span>
+          <span className="font-bold">View</span>
         </button>
         <button onClick={() => setModal({ type: "edit", record })}
           className="flex-1 flex items-center justify-center gap-1.5 p-2 text-[#4e7397] hover:text-primary hover:bg-primary/10 rounded-lg transition-colors text-xs sm:text-sm">
-          <span className="material-symbols-outlined text-base">edit</span>
-          <span className="hidden sm:inline">Edit</span>
+          <span className="font-bold">Edit</span>
         </button>
         <button onClick={() => setModal({ type: "delete", record })}
           className="flex-1 flex items-center justify-center gap-1.5 p-2 text-[#4e7397] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors text-xs sm:text-sm">
-          <span className="material-symbols-outlined text-base">delete</span>
-          <span className="hidden sm:inline">Delete</span>
+          <span className="font-bold ">Delete</span>
         </button>
       </div>
     </div>
@@ -286,14 +285,6 @@ const AdminHealthRecords = () => {
         </div>
       </div>
 
-      {/* ── Error ── */}
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm flex items-center gap-2">
-          <span className="material-symbols-outlined text-base flex-shrink-0">error</span>
-          {error} — <button onClick={fetchRecords} className="underline font-bold">Retry</button>
-        </div>
-      )}
-
       {/* ── Stats ── */}
       <StatsGrid>
         {statsdata.map((stat, idx) => (
@@ -337,7 +328,6 @@ const AdminHealthRecords = () => {
           renderCard={renderCard}
           empty="No health records found."
           pagination={
-            totalPages > 1 ? (
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -345,7 +335,6 @@ const AdminHealthRecords = () => {
                 itemsPerPage={itemsPerPage}
                 onPageChange={goToPage}
               />
-            ) : null
           }
         />
       )}
@@ -394,6 +383,9 @@ const AdminHealthRecords = () => {
           onCancel={closeModal}
         />
       )}
+
+      {/* ── Toast ── */}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 };
