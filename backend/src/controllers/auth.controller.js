@@ -185,6 +185,7 @@
 const db = require("../config/db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const log = require("../helper/recentLog/RecentLogHelper")
 
 // Helper function: generate JWT
 const generateToken = (id, role) => {
@@ -214,8 +215,16 @@ exports.loginUser = (req, res) => {
 
     const user = results[0];
 
-    // ✅ Helper para i-send ang response kasama full_name at image
+
     const sendResponse = () => {
+      db.query(
+        "UPDATE user SET last_login = NOW() WHERE user_id = ?",
+        [user.user_id],
+        (err) => { if (err) console.error("Failed to update last_login:", err); }
+      );
+
+      log(user.user_id, `${user.full_name} logged in`, "User Login/Logout", `Role: ${user.role}`);
+
       const token = generateToken(user.user_id, user.role);
       return res.json({
         Status: "Success",
@@ -270,6 +279,14 @@ exports.loginPWD = (req, res) => {
       bcrypt.compare(password, user.password, (err, match) => {
         if (err) return res.status(500).json({ Error: "Server error" });
         if (!match) return res.status(401).json({ Error: "Wrong password" });
+
+        db.query(
+          "UPDATE user SET last_login = NOW() WHERE user_id = ?",
+          [user.user_id],
+          (err) => { if (err) console.error("Failed to update last_login:", err); }
+        );
+
+        log(user.user_id, `${user.full_name} logged in`, "User Login/Logout", `PWD Number: ${pwd_number}`);
 
         const token = generateToken(user.user_id, user.role);
         res.json({

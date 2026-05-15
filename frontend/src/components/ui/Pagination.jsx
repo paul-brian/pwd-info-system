@@ -80,62 +80,85 @@ const Pagination = ({ currentPage, totalPages, totalItems, itemsPerPage, onPageC
       </div>
 
       {/* Mobile Pagination */}
-      <div className="md:hidden px-3 py-3
-        bg-gradient-to-r from-slate-50 to-transparent dark:from-slate-800/30 dark:to-transparent
-        border-t border-slate-200 dark:border-slate-700/50">
+      <div className="md:hidden px-3 py-3 border-t
+  border-slate-200 dark:border-slate-700/50
+  bg-white/80 dark:bg-slate-900/80 backdrop-blur">
 
-        <p className="text-[10px] text-slate-600 dark:text-slate-400 font-medium mb-2.5 text-center">
-          Page{" "}
-          <span className="font-bold text-slate-900 dark:text-white">{currentPage}</span>
-          {" "}of{" "}
-          <span className="font-bold text-slate-900 dark:text-white">{totalPages}</span>
-        </p>
+        {/* Page Info */}
+        <div className="text-center mb-3">
+          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+            Page
+            <span className="mx-1 font-bold text-slate-900 dark:text-white">
+              {currentPage}
+            </span>
+            of
+            <span className="ml-1 font-bold text-slate-900 dark:text-white">
+              {totalPages}
+            </span>
+          </p>
+        </div>
 
+        {/* Controls */}
         <div className="flex items-center justify-between gap-2">
+
+          {/* PREV */}
           <button
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="flex-1 h-10 flex items-center justify-center rounded-lg
-              border border-slate-200 dark:border-slate-700/50
-              bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400
-              hover:bg-slate-100 dark:hover:bg-slate-700
-              disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="h-11 px-4 flex items-center justify-center
+        rounded-xl border
+        border-slate-200 dark:border-slate-700
+        bg-white dark:bg-slate-800
+        active:scale-95 transition
+        disabled:opacity-40"
           >
-            <span className="material-symbols-outlined text-lg">chevron_left</span>
+            <span className="material-symbols-outlined text-xl">
+              chevron_left
+            </span>
           </button>
 
-          <div className="flex-1 flex items-center justify-center gap-1.5">
-            {Array.from({ length: Math.min(3, totalPages) }, (_, i) => {
-              const pageNum = currentPage + (i - 1);
-              if (pageNum < 1 || pageNum > totalPages) return null;
+          {/* PAGE PILLS */}
+          <div className="flex items-center gap-2">
+
+            {Array.from({ length: 3 }, (_, i) => {
+              const page = currentPage - 1 + i;
+
+              if (page < 1 || page > totalPages) return null;
+
               return (
                 <button
-                  key={pageNum}
-                  onClick={() => onPageChange(pageNum)}
-                  className={`w-10 h-10 flex items-center justify-center rounded-lg border
-                    font-bold text-xs transition-all duration-200 ${
-                    currentPage === pageNum
-                      ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
-                      : "border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700"
-                  }`}
+                  key={page}
+                  onClick={() => onPageChange(page)}
+                  className={`min-w-[42px] h-11 px-3
+              rounded-xl font-semibold text-sm
+              transition-all duration-200
+              ${currentPage === page
+                      ? "bg-primary text-white shadow-lg shadow-primary/25 scale-105"
+                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 active:scale-95"
+                    }`}
                 >
-                  {pageNum}
+                  {page}
                 </button>
               );
             })}
           </div>
 
+          {/* NEXT */}
           <button
             onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage === totalPages || totalPages === 0}
-            className="flex-1 h-10 flex items-center justify-center rounded-lg
-              border border-slate-200 dark:border-slate-700/50
-              bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400
-              hover:bg-slate-100 dark:hover:bg-slate-700
-              disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="h-11 px-4 flex items-center justify-center
+        rounded-xl border
+        border-slate-200 dark:border-slate-700
+        bg-white dark:bg-slate-800
+        active:scale-95 transition
+        disabled:opacity-40"
           >
-            <span className="material-symbols-outlined text-lg">chevron_right</span>
+            <span className="material-symbols-outlined text-xl">
+              chevron_right
+            </span>
           </button>
+
         </div>
       </div>
     </>

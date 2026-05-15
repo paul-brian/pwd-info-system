@@ -21,13 +21,13 @@ const AdminLayout = () => {
   }, []);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-white dark:bg-slate-900">
+    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950">
       <Sidebar open={open} setOpen={setOpen} pendingAccessCount={pendingCount} />
 
       <div className="flex-1 flex flex-col min-w-0">
         <Header onMenu={() => setOpen(true)} />
 
-        <main className="bg-white dark:bg-slate-900 flex-1 overflow-auto overflow-x-hidden">
+        <main className="bg-slate-50 dark:bg-slate-950 flex-1 overflow-auto overflow-x-hidden">
           <Outlet />
         </main>
       </div>

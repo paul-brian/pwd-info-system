@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "../../components/ui/Toast";
+import logo from "../../assets/image/logo_trapiche.jpg";
 import useToast from "../../hooks/useToast";
 import axios from 'axios';
 import API_URL from "../../api/api";
@@ -37,7 +38,7 @@ const RequestAccess = () => {
       setForm({ fullName: "", email: "", role: "", office: "", reason: "" });
       setTimeout(() => navigate("/AdminStaffLogin"), 4000);
     } catch (err) {
-      showToast(error.response?.data?.error || error.response?.data?.message || "Something went wrong.", "error");
+      showToast(err.response?.data?.error || err.response?.data?.message || "Something went wrong.", "error");
     } finally {
       setLoading(false);
     }
@@ -55,7 +56,7 @@ const RequestAccess = () => {
 
           <div className="relative z-10 text-center">
             <img
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfU84kTLMMyDY39DJnKEm3nYMmvy7Da-VCIZ5z-A4CfhiqNrNJ2cDvZgDhl6SqyPB2r97145a8u-ltQlRnA_obFHZSnvEKv1VFwZA3iUjCJnH9nAXoDFAdjBEMDaiOuvCY_QRzsNLiUsm-7NFFeMaK9skAqzCfCS_Mb27NoNfaGipWeBYwYRpQwzvV5TEjNt1CAj_YqIERRjoQjrqlAim7PYEx8sDUudgPfhZ2U3Cf2UyvVuBMf-Dp4TG9RAxKDDioqGLjCWoO-DOd"
+              src={logo}
               alt="PWD Logo"
               className="w-36 h-36 rounded-full object-cover shadow-xl mx-auto mb-4 ring-2 ring-primary/30"
             />
@@ -78,7 +79,7 @@ const RequestAccess = () => {
             {/* LOGO — mobile only */}
             <div className="flex flex-col items-center mb-6 md:hidden">
               <img
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfU84kTLMMyDY39DJnKEm3nYMmvy7Da-VCIZ5z-A4CfhiqNrNJ2cDvZgDhl6SqyPB2r97145a8u-ltQlRnA_obFHZSnvEKv1VFwZA3iUjCJnH9nAXoDFAdjBEMDaiOuvCY_QRzsNLiUsm-7NFFeMaK9skAqzCfCS_Mb27NoNfaGipWeBYwYRpQwzvV5TEjNt1CAj_YqIERRjoQjrqlAim7PYEx8sDUudgPfhZ2U3Cf2UyvVuBMf-Dp4TG9RAxKDDioqGLjCWoO-DOd"
+                src={logo}
                 alt="PWD Logo"
                 className="w-24 h-24 rounded-full object-cover shadow-2xl mb-3 ring-2 ring-primary/40"
               />

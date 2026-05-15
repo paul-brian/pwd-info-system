@@ -64,7 +64,7 @@ import React from "react";
 const Cards = ({ stat }) => {
   return (
     <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800/50
-      rounded-2xl border border-slate-200 dark:border-slate-700/50 shadow-sm
+      rounded-2xl border border-slate-200 dark:border-slate-900/50 shadow-sm
       hover:shadow-lg transition-all duration-300
       hover:border-primary/30 dark:hover:border-primary/20
       p-3 sm:p-3.5 md:p-4 lg:p-4.5 xl:p-5 2xl:p-6">

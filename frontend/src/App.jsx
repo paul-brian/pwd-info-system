@@ -15,6 +15,8 @@ import RequestAccess from "./pages/Auth/RequestAccess";
 import PagesLayout from "./Layouts/PagesLayout";
 import PagesDashboard from "./pages/dashboard/PagesDashboard";
 import PagesProfiling from "./pages/profiling/PagesProfiling";
+import PagesAssistance from "./pages/AssistanceHistory/PagesAssistance"
+import PagesHealthStatus from "./pages/health/PagesHealthStatus"
 import PagesInventory from "./pages/inventory/PagesInventory";
 import PagesHealthRecords from "./pages/health/PagesHealthRecords";
 import PagesSms from "./pages/sms/PagesSms";
@@ -60,6 +62,18 @@ const App = () => {
             </ProtectedRoute>
           } />
 
+          <Route path="/PagesAssistance" element={
+            <ProtectedRoute allowedRoles={[ROLES.USER]}>
+              <PagesAssistance />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/PagesHealthStatus" element={
+            <ProtectedRoute allowedRoles={[ROLES.USER]}>
+              <PagesHealthStatus />
+            </ProtectedRoute>
+          } />
+
           <Route path="/PagesEvents" element={
             <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.STAFF, ROLES.USER]}>
               <PagesEvents />
@@ -72,7 +86,6 @@ const App = () => {
             </ProtectedRoute>
           } />
 
-          {/* Admin + Staff only */}
           <Route path="/PagesInventory" element={
             <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.STAFF]}>
               <PagesInventory />
@@ -85,14 +98,12 @@ const App = () => {
             </ProtectedRoute>
           } />
 
-          {/* Admin only */}
           <Route path="/PagesSms" element={
             <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
               <PagesSms />
             </ProtectedRoute>
           } />
 
-          {/* User only */}
           <Route path="/PagesAnnouncements" element={
             <ProtectedRoute allowedRoles={[ROLES.USER]}>
               <PagesAnnouncements />
@@ -100,7 +111,6 @@ const App = () => {
           } />
 
         </Route>
-
       </Routes>
     </Router>
   );

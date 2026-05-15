@@ -2,16 +2,28 @@ const db = require("../../config/db");
 
 const Health = {
 
+  // ✅ JOIN pwd_profiles + user para makuha pwd_number at full_name
   getAll: (callback) => {
-    db.query("SELECT * FROM health_records", callback);
+    const sql = `
+      SELECT h.*, p.pwd_number, u.full_name AS pwd_name
+      FROM health_records h
+      JOIN pwd_profiles p ON h.pwd_id = p.pwd_id
+      JOIN user u ON p.user_id = u.user_id
+      ORDER BY h.recorded_at DESC
+    `;
+    db.query(sql, callback);
   },
 
   getByPwd: (pwd_id, callback) => {
-    db.query(
-      "SELECT * FROM health_records WHERE pwd_id = ?",
-      [pwd_id],
-      callback
-    );
+    const sql = `
+      SELECT h.*, p.pwd_number, u.full_name AS pwd_name
+      FROM health_records h
+      JOIN pwd_profiles p ON h.pwd_id = p.pwd_id
+      JOIN user u ON p.user_id = u.user_id
+      WHERE h.pwd_id = ?
+      ORDER BY h.recorded_at DESC
+    `;
+    db.query(sql, [pwd_id], callback);
   },
 
   create: (data, callback) => {
@@ -20,7 +32,6 @@ const Health = {
       (pwd_id, blood_pressure, heart_rate, temperature, weight, blood_sugar, remarks, health_status)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
-
     db.query(sql, [
       data.pwd_id,
       data.blood_pressure,
@@ -29,17 +40,17 @@ const Health = {
       data.weight,
       data.blood_sugar,
       data.remarks,
-      data.health_status
+      data.health_status,
     ], callback);
   },
 
   update: (id, data, callback) => {
     const sql = `
       UPDATE health_records
-      SET blood_pressure=?, heart_rate=?, temperature=?, weight=?, blood_sugar=?, remarks=?, health_status=?
+      SET blood_pressure=?, heart_rate=?, temperature=?, weight=?,
+          blood_sugar=?, remarks=?, health_status=?
       WHERE health_id=?
     `;
-
     db.query(sql, [
       data.blood_pressure,
       data.heart_rate,
@@ -48,7 +59,7 @@ const Health = {
       data.blood_sugar,
       data.remarks,
       data.health_status,
-      id
+      id,
     ], callback);
   },
 
@@ -56,13 +67,15 @@ const Health = {
     db.query("DELETE FROM health_records WHERE health_id=?", [id], callback);
   },
 
-  
   getMyHealth: (userId, callback) => {
     const sql = `
-      SELECT h.* FROM health_records h
+      SELECT h.*, p.pwd_number, u.full_name AS pwd_name
+      FROM health_records h
       JOIN pwd_profiles p ON h.pwd_id = p.pwd_id
+      JOIN user u ON p.user_id = u.user_id
       WHERE p.user_id = ?
       ORDER BY h.recorded_at DESC
+      LIMIT 5
     `;
     db.query(sql, [userId], callback);
   },

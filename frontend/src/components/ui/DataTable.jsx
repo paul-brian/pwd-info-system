@@ -15,7 +15,7 @@ const DataTable = ({ columns, data, renderRow, renderCard, pagination, empty = "
       {/* ── Desktop: Table (lg+) ── */}
       <div className="hidden lg:block bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700/50 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full table-fixed text-left border-collapse">
+          <table className="w-full min-w-max text-center border-collapse">
             <thead className="bg-gradient-to-r from-slate-50 to-transparent dark:from-slate-800/50 dark:to-transparent border-b border-slate-200 dark:border-slate-700/50">
               <tr>
                 {columns.map((col) => (

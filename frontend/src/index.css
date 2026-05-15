@@ -32,4 +32,66 @@
     }
   }
 
+  /* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+ 
+/* ── Base ── */
+@layer base {
+  html {
+    @apply antialiased;
+  }
+ 
+  body {
+    @apply bg-slate-50 text-slate-900;
+    @apply dark:bg-slate-950 dark:text-slate-100;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+}
+ 
+/* ── Dark Mode Color System ── */
+@layer utilities {
+ 
+  /* Backgrounds — hierarchy of depth */
+  .dark-bg-base    { @apply dark:bg-slate-950; }  /* page background */
+  .dark-bg-surface { @apply dark:bg-slate-900; }  /* cards, panels */
+  .dark-bg-raised  { @apply dark:bg-slate-800; }  /* elevated elements, inputs */
+  .dark-bg-overlay { @apply dark:bg-slate-700; }  /* tooltips, dropdowns */
+ 
+  /* Borders */
+  .dark-border     { @apply dark:border-slate-700/60; }
+  .dark-border-sub { @apply dark:border-slate-800; }
+ 
+  /* Text */
+  .dark-text-primary   { @apply dark:text-slate-100; }
+  .dark-text-secondary { @apply dark:text-slate-400; }
+  .dark-text-muted     { @apply dark:text-slate-500; }
+}
+ 
+/* ── Layout transitions ── */
+* {
+  transition-property: background-color, border-color, color;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
+}
+ 
+/* Exclude transitions on animations */
+.animate-spin,
+.animate-pulse,
+.animate-float {
+  transition: none;
+}
+
 }

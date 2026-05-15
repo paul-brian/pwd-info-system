@@ -127,7 +127,8 @@ const ProfileSettings = () => {
 
   return (
     <div className="w-full">
-      <div className="mb-4 sm:mb-6 md:mb-8">
+      
+      <div className="mb-4 sm:mb-6 md:mb-8 bg-white dark:bg-slate-900 p-4 sm:p-5 md:p-6 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm">
         <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white">Account Settings</h1>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
           Manage your personal information and security preferences.
@@ -217,7 +218,7 @@ const ProfileSettings = () => {
                 }`}
               >
                 <span className="material-symbols-outlined text-base md:text-lg">{item.icon}</span>
-                <span className="hidden sm:inline">{item.label}</span>
+                <span>{item.label}</span>
               </button>
             ))}
           </div>

@@ -61,7 +61,7 @@ const ConfirmModal = ({
 
       <div className="mt-6 flex flex-col-reverse lg:flex-row justify-end gap-2 lg:gap-3">
         <button onClick={onCancel}
-          className="px-4 lg:px-6 py-2.5 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-600 transition-all text-sm lg:text-base">
+          className="px-4 lg:px-6 py-2.5 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-600 transition-all text-sm lg:text-base">
           Cancel
         </button>
         <button onClick={onConfirm}

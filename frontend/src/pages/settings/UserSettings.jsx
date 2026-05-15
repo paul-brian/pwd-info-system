@@ -38,7 +38,7 @@ const UserSettings = () => {
     emergency_contact: "",
   });
 
-  const [accountForm, setAccountForm] = useState({ full_name: "", email: "" });
+  const [accountForm, setAccountForm] = useState({ contact_number: "", email: "" });
 
   const [pwForm, setPwForm] = useState({
     oldPassword: "",
@@ -65,7 +65,7 @@ const UserSettings = () => {
         address: data.address || "",
         emergency_contact: data.emergency_contact || "",
       });
-      setAccountForm({ full_name: data.full_name || "", email: data.email || "" });
+      setAccountForm({ contact_number: data.contact_number || "", email: data.email || "" });
     } catch (err) {
       showToast(err.response?.data?.error || "Failed to load profile", "error");
     } finally {
@@ -89,7 +89,7 @@ const UserSettings = () => {
   };
 
   const handleUpdateAccount = async () => {
-    if (!accountForm.full_name || !accountForm.email)
+    if (!accountForm.contact_number || !accountForm.email)
       return showToast("All fields required", "error");
     try {
       setSaving(true);
@@ -163,14 +163,15 @@ const UserSettings = () => {
   }
 
   return (
-    <main className="flex-1 px-3 sm:px-4 md:px-8 py-4 sm:py-6 md:py-8 overflow-y-auto">
-      <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
-
-        <div>
-          <h2 className="text-slate-900 dark:text-slate-50 text-lg sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-tight">Profile Settings</h2>
-          <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-1">Manage your personal information and account security.</p>
+    <main>
+      <div className="px-3 sm:px-4 md:px-8 py-4 sm:py-6 md:py-8 w-full flex flex-col gap-4 sm:gap-6 md:gap-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4
+         bg-white dark:bg-slate-900 p-4 sm:p-5 md:p-6 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm">
+          <div className="flex flex-col gap-1">
+            <h1 className="text-[#0e141b] dark:text-white text-xl sm:text-3xl md:text-4xl font-black leading-tight tracking-tight">Profile Settings</h1>
+            <p className="text-[#4e7397] dark:text-slate-400 text-xs sm:text-sm md:text-base">Manage your personal information and account security.</p>
+          </div>
         </div>
-
         {/* Profile Header */}
         <section className="bg-white dark:bg-slate-900 p-3 sm:p-4 md:p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 md:gap-8">
@@ -182,10 +183,6 @@ const UserSettings = () => {
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary to-blue-600 text-white text-4xl font-black">{initials}</div>
                 )}
               </div>
-              <button onClick={() => fileInputRef.current?.click()} className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full shadow-lg border-2 border-white dark:border-slate-900 hover:bg-blue-600 transition-all">
-                <span className="material-symbols-outlined text-base">photo_camera</span>
-              </button>
-              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
             </div>
             <div className="flex-1 text-center sm:text-left space-y-1.5 sm:space-y-2">
               <h3 className="text-slate-900 dark:text-slate-50 text-lg sm:text-xl md:text-2xl font-bold">{profile?.full_name}</h3>
@@ -203,23 +200,37 @@ const UserSettings = () => {
                   {profile?.status}
                 </span>
               </div>
-              <div className="pt-2">
+              <div className="pt-2 flex justify-center sm:justify-start">
                 <button onClick={() => fileInputRef.current?.click()} className="px-3.5 sm:px-5 h-9 sm:h-10 md:h-11 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 text-xs sm:text-sm">
                   <span className="material-symbols-outlined text-base">upload</span>
                   Change Photo
                 </button>
+                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
               </div>
             </div>
           </div>
         </section>
 
         {/* Tabs */}
-        <div className="flex gap-1 border-b border-slate-200 dark:border-slate-700">
+        <div
+          className="flex justify-evenly sm:justify-evenly lg:justify-evenly border-b border-slate-200 dark:border-slate-700 overflow-x-auto lg:overflow-visible">
           {tabs.map((tab) => (
-            <button key={tab.key} onClick={() => setActiveSection(tab.key)}
-              className={`flex items-center gap-2 px-3 sm:px-4 md:px-5 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all ${activeSection === tab.key ? "border-primary text-primary" : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"}`}>
-              <span className="material-symbols-outlined text-sm md:text-base">{tab.icon}</span>
-              <span className="hidden sm:inline md:hidden lg:inline">{tab.label}</span>
+            <button
+              key={tab.key}
+              onClick={() => setActiveSection(tab.key)}
+              className={`flex-shrink-0 lg:flex-1 flex items-center justify-center gap-2 px-3 sm:px-4 md:px-5 py-3 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all
+                  ${activeSection === tab.key
+                  ? "border-primary text-primary"
+                  : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                }
+               `}
+             >
+              <span className="material-symbols-outlined text-sm md:text-base">
+                {tab.icon}
+              </span>
+              <span className="sm:inline lg:inline">
+                {tab.label}
+              </span>
             </button>
           ))}
         </div>
@@ -291,12 +302,12 @@ const UserSettings = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
               <div className="space-y-1.5 sm:space-y-2">
-                <label className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300">Full Name</label>
+                <label className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300">Contact Number</label>
                 <div className="relative">
                   <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">person</span>
-                  <input type="text" value={accountForm.full_name} onChange={(e) => setAccountForm({ ...accountForm, full_name: e.target.value })}
+                  <input type="text" value={accountForm.contact_number} onChange={(e) => setAccountForm({ ...accountForm, contact_number: e.target.value })}
                     className="w-full h-9 sm:h-10 md:h-12 pl-11 pr-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs sm:text-sm focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all outline-none"
-                    placeholder="Enter your full name" />
+                    placeholder="Enter your Contact Number" />
                 </div>
               </div>
               <div className="space-y-1.5 sm:space-y-2">

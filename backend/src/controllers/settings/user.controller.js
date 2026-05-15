@@ -1,9 +1,10 @@
 const db = require("../../config/db");
+const log = require("../../helper/recentLog/RecentLogHelper")
 const bcrypt = require("bcrypt");
 
 // List all users
 exports.listUsers = (req, res) => {
-  const sql = `SELECT user_id, full_name, email, role, status, image, created_at 
+  const sql = `SELECT user_id, full_name, email, role, status, image, created_at, last_login
                FROM user 
                ORDER BY created_at DESC`;
 
@@ -25,6 +26,7 @@ exports.editUser = (req, res) => {
     const pwdSql = `UPDATE pwd_profiles SET status=? WHERE user_id=?`;
     db.query(pwdSql, [status, userId], (err2) => {
       if (err2) return res.status(500).json({ Error: "Error updating PWD status" });
+      log(req.user?.id, `Updated user: ${full_name}`, "User Login/Logout", `Role: ${role}, Status: ${status}`);
       res.json({ Status: "User updated successfully" });
     });
   });
@@ -44,6 +46,7 @@ exports.toggleUserStatus = (req, res) => {
     const pwdSql = `UPDATE pwd_profiles SET status=? WHERE user_id=?`;
     db.query(pwdSql, [status, userId], (err2) => {
       if (err2) return res.status(500).json({ Error: "Error updating PWD status" });
+      log(req.user?.id, `User ID ${userId} status changed to ${status}`, "User Login/Logout", `User ID: ${userId}`);
       res.json({ Status: `User ${status}` });
     });
   });

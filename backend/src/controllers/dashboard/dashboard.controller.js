@@ -64,9 +64,8 @@ exports.getMonthlyRegistrations = (req, res) => {
 exports.getRecentPWDs = (req, res) => {
   const sql = `
     SELECT
-      p.pwd_id,
+      p.pwd_number,
       u.full_name,
-      u.image,
       p.disability_type,
       p.contact_number,
       p.status,
@@ -74,7 +73,7 @@ exports.getRecentPWDs = (req, res) => {
     FROM pwd_profiles p
     JOIN user u ON p.user_id = u.user_id
     ORDER BY p.created_at DESC
-    LIMIT 5
+    LIMIT 3
   `;
 
   db.query(sql, (err, results) => {

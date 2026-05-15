@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import API_URL from "../../../api/api";
+import { StatCardsLoader, TableLoader } from "../../../components/ui/Loading";
 import StatsCards   from "../../../components/ui/StatsCards";
 import StatsGrid from "../../../components/ui/StatsGrid";
 import SearchBar    from "../../../components/ui/SearchBar";
@@ -9,18 +10,20 @@ import ConfirmModal from "../../../components/modals/ConfirmModal";
 
 export default function AccessRequests({ showToast, onPendingCountChange }) {
   const [accessRequests, setAccessRequests] = useState([]);
-  const [currentPage, setCurrentPage]       = useState(1);
-  const [loading, setLoading]               = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
   const [selectedRequest, setSelectedRequest] = useState(null);
-  const [activeModal, setActiveModal]       = useState(null);
-  const [filterStatus, setFilterStatus]     = useState("all");
-  const [search, setSearch]                 = useState("");
+  const [activeModal, setActiveModal] = useState(null);
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [search, setSearch] = useState("");
   const itemsPerPage = 6;
 
   const fetchAccessRequests = async () => {
     try {
       setLoading(true);
       const res  = await fetch(`${API_URL}/api/access/requests`);
+      setData(res.data);
       const data = await res.json();
       const mapped = (Array.isArray(data) ? data : data.data || []).map((r) => ({
         id:         r.request_id,
@@ -75,6 +78,9 @@ export default function AccessRequests({ showToast, onPendingCountChange }) {
     { label: "Rejected",       icon: "cancel",        value: accessRequests.filter((r) => r.status === "rejected").length,  change: "", changeText: "denied access",   changeClass: "text-red-500"     },
   ];
 
+  // ── Table columns ──
+  const columns =["User", "Email", "Role", "Status", "Created Date", "Actions"];
+
   // ── Table Row ──
   const renderRow = (req) => (
     <tr key={req.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
@@ -125,7 +131,7 @@ export default function AccessRequests({ showToast, onPendingCountChange }) {
 
       {/* ── Role + Date ── */}
       <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-2.5">
-        {req.role} · {req.created_at ? new Date(req.created_at).toLocaleDateString("en-PH") : "—"}
+        {req.role}    {req.created_at ? new Date(req.created_at).toLocaleString("en-PH", { weekday: "short", year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "—"}
       </p>
 
       {/* ── Buttons — nasa baba, full width ── */}
@@ -134,14 +140,12 @@ export default function AccessRequests({ showToast, onPendingCountChange }) {
           <button
             onClick={() => { setSelectedRequest(req); setActiveModal("approve"); }}
             className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors">
-            <span className="material-symbols-outlined text-sm">check_circle</span>
-            Approve
+            <span className="font-bold">Approve</span>
           </button>
           <button
             onClick={() => { setSelectedRequest(req); setActiveModal("reject"); }}
             className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold transition-colors">
-            <span className="material-symbols-outlined text-sm">close</span>
-            Reject
+            <span className="font-bold">Reject</span>
           </button>
         </div>
       )}
@@ -152,9 +156,8 @@ export default function AccessRequests({ showToast, onPendingCountChange }) {
     <div className="flex flex-col gap-4 sm:gap-6">
 
       {/* ── Header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3
-        bg-gradient-to-r from-slate-50 to-transparent dark:from-slate-800/30 dark:to-transparent
-        p-3 sm:p-5 rounded-2xl border border-slate-100 dark:border-slate-800/50">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4
+         bg-white dark:bg-slate-900 p-4 sm:p-5 md:p-6 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm">
         <div className="flex items-center gap-3">
           <div>
             <h1 className="text-lg sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-white leading-tight tracking-tight">
@@ -167,11 +170,13 @@ export default function AccessRequests({ showToast, onPendingCountChange }) {
         </div>
       </div>
 
-      <StatsGrid>
-        {statsdata.map((stat, idx) => (
-          <StatsCards key={idx} stat={stat} />
-        ))}
-      </StatsGrid>
+      {/* ── Stats ── */}
+      {loading ? <StatCardsLoader count={4} /> :
+        <StatsGrid>
+          {statsdata.map((stat, idx) => (
+            <StatsCards key={idx} stat={stat} />
+          ))}
+        </StatsGrid>}
 
       {/* ── Search ── */}
       <SearchBar
@@ -190,12 +195,10 @@ export default function AccessRequests({ showToast, onPendingCountChange }) {
 
       {/* ── Table ── */}
       {loading ? (
-        <div className="p-10 text-center text-sm text-slate-500 dark:text-slate-400">
-          Loading requests...
-        </div>
+        <TableLoader rows={6} cols={columns.length} />
       ) : (
         <DataTable
-          columns={["User", "Email", "Role", "Status", "Created Date", "Actions"]}
+          columns={columns}
           data={paginated}
           renderRow={renderRow}
           renderCard={renderCard}

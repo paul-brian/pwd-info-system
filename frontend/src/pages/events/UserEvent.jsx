@@ -1,342 +1,254 @@
-// import React, { useState, useEffect } from "react";
-
-// const dummyEvents = [
-//   { name: "PWD General Assembly", date: "Oct 12, 2023 • 09:00 AM", venue: "Barangay Hall", status: "Attended" },
-//   { name: "Assistive Device Distribution", date: "Nov 05, 2023 • 01:30 PM", venue: "Covered Court", status: "Registered" },
-//   { name: "Health and Wellness Seminar", date: "Sep 20, 2023 • 08:00 AM", venue: "Multi-purpose Bldg", status: "Absent" },
-//   { name: "Year-end Celebration", date: "Dec 15, 2023 • 05:00 PM", venue: "Trapiche Plaza", status: "Registered" },
-//   { name: "Disability Rights Forum", date: "Aug 12, 2023 • 10:00 AM", venue: "Barangay Hall", status: "Attended" },
-// ];
-
-// const statusColors = {
-//   Attended: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-//   Registered: "bg-primary/10 text-primary dark:bg-primary/20",
-//   Absent: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
-// };
-
-// const EventAttendance = () => {
-//   const [activeTab, setActiveTab] = useState("All");
-//   const [searchQuery, setSearchQuery] = useState("");
-//   const [stats, setStats] = useState({ Attended: 0, Registered: 0, Missed: 0 });
-
-//   // Filter events based on tab and search
-//   const filteredEvents = dummyEvents
-//     .filter((event) => {
-//       if (activeTab === "Upcoming") return event.status === "Registered";
-//       if (activeTab === "History") return event.status === "Attended" || event.status === "Absent";
-//       return true;
-//     })
-//     .filter((event) =>
-//       event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-//       event.venue.toLowerCase().includes(searchQuery.toLowerCase())
-//     );
-
-//   // Live stats calculation
-//   useEffect(() => {
-//     const calculateStats = () => {
-//       let attended = 0, registered = 0, missed = 0;
-//       dummyEvents.forEach((e) => {
-//         if (e.status === "Attended") attended++;
-//         else if (e.status === "Registered") registered++;
-//         else if (e.status === "Absent") missed++;
-//       });
-//       setStats({ Attended: attended, Registered: registered, Missed: missed });
-//     };
-//     calculateStats();
-//     const interval = setInterval(calculateStats, 5000);
-//     return () => clearInterval(interval);
-//   }, []);
-
-//   return (
-//     <main className="flex-1 flex flex-col overflow-y-auto px-3 sm:px-4 md:px-8 py-4 sm:py-6 md:py-8 space-y-4 sm:space-y-6">
-//       {/* Header */}
-//       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-//         <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white">My Event Attendance</h2>
-
-//       </header>
-
-//       {/* Stats Cards */}
-//       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
-//         {["Attended", "Registered", "Missed"].map((key) => (
-//           <div key={key} className="bg-white dark:bg-slate-900 p-3 sm:p-4 md:p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3 sm:gap-4">
-//             <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 text-2xl">
-//               <span className="material-symbols-outlined">
-//                 {key === "Attended" ? "how_to_reg" : key === "Registered" ? "pending_actions" : "event_busy"}
-//               </span>
-//             </div>
-//             <div>
-//               <p className="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-widest">{key}</p>
-//               <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-1">{stats[key]}</p>
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-
-//       {/* Tabs */}
-//       <div className="flex gap-2 sm:gap-4 mb-4 sm:mb-6 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
-//         {["All", "Upcoming", "History"].map((tab) => (
-//           <button
-//             key={tab}
-//             onClick={() => setActiveTab(tab)}
-//             className={`pb-2 text-xs sm:text-sm md:text-base font-bold whitespace-nowrap ${
-//               activeTab === tab ? "border-b-2 border-primary text-primary" : "text-slate-500 dark:text-slate-400 hover:text-primary transition-colors"
-//             }`}
-//           >
-//             {tab} Events
-//           </button>
-//         ))}
-//       </div>
-
-//       {/* Search */}
-//       <div className="mb-4 sm:mb-6 w-full sm:max-w-md">
-//         <div className="relative">
-//           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 material-symbols-outlined text-base md:text-lg">search</span>
-//           <input
-//             type="text"
-//             placeholder="Search event..."
-//             value={searchQuery}
-//             onChange={(e) => setSearchQuery(e.target.value)}
-//             className="w-full pl-10 pr-4 py-2.5 sm:py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs sm:text-sm md:text-base focus:ring-2 focus:ring-primary transition-all"
-//           />
-//         </div>
-//       </div>
-
-//       {/* Table */}
-//       <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-//         <table className="w-full text-left border-collapse">
-//           <thead>
-//             <tr className="bg-slate-50 dark:bg-slate-800/50">
-//               <th className="px-3 md:px-4 lg:px-6 py-3 text-[10px] md:text-xs lg:text-sm font-bold text-slate-900 dark:text-white">Event Name</th>
-//               <th className="px-3 md:px-4 lg:px-6 py-3 text-[10px] md:text-xs lg:text-sm font-bold text-slate-900 dark:text-white">Date</th>
-//               <th className="px-3 md:px-4 lg:px-6 py-3 text-[10px] md:text-xs lg:text-sm font-bold text-slate-900 dark:text-white">Venue</th>
-//               <th className="px-3 md:px-4 lg:px-6 py-3 text-[10px] md:text-xs lg:text-sm font-bold text-slate-900 dark:text-white text-center">My Status</th>
-//             </tr>
-//           </thead>
-//           <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-//             {filteredEvents.map((event, i) => (
-//               <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-//                 <td className="px-3 md:px-4 lg:px-6 py-3 text-[9px] md:text-xs lg:text-sm font-medium text-slate-900 dark:text-white">{event.name}</td>
-//                 <td className="px-3 md:px-4 lg:px-6 py-3 text-[9px] md:text-xs lg:text-sm text-slate-600 dark:text-slate-400">{event.date}</td>
-//                 <td className="px-3 md:px-4 lg:px-6 py-3 text-[9px] md:text-xs lg:text-sm text-slate-600 dark:text-slate-400">{event.venue}</td>
-//                 <td className="px-3 md:px-4 lg:px-6 py-3 text-center">
-//                   <span className={`inline-flex items-center px-2.5 md:px-3 py-1 rounded-full text-[8px] md:text-xs lg:text-sm font-bold ${statusColors[event.status]}`}>
-//                     {event.status === "Attended" && <span className="material-symbols-outlined text-[10px] md:text-xs mr-1">check_circle</span>}
-//                     {event.status === "Registered" && <span className="material-symbols-outlined text-[10px] md:text-xs mr-1">app_registration</span>}
-//                     {event.status === "Absent" && <span className="material-symbols-outlined text-[10px] md:text-xs mr-1">cancel</span>}
-//                     {event.status}
-//                   </span>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       </div>
-
-//     </main>
-//   );
-// };
-
-// export default EventAttendance;
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import API_URL from "../../api/api";
-
+import StatsCards from "../../components/ui/StatsCards";
+import StatsGrid  from "../../components/ui/StatsGrid";
+import SearchBar  from "../../components/ui/SearchBar";
+import DataTable  from "../../components/ui/DataTable";
+import Pagination from "../../components/ui/Pagination";
+import { StatCardsLoader, TableLoader } from "../../components/ui/Loading";
 
 const BASE_URL = `${API_URL}/api`;
 
-const getToken = () =>
-  localStorage.getItem("userToken") || sessionStorage.getItem("userToken");
-
+const getToken   = () => localStorage.getItem("userToken") || sessionStorage.getItem("userToken");
 const authHeader = () => ({ Authorization: `Bearer ${getToken()}` });
 
+const formatDate = (dateStr) =>
+  dateStr ? new Date(dateStr).toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric" }) : "—";
+
+const formatTime = (timeStr) => {
+  if (!timeStr) return "—";
+  const [h, m] = timeStr.split(":");
+  const hour = parseInt(h);
+  return `${hour % 12 || 12}:${m} ${hour >= 12 ? "PM" : "AM"}`;
+};
+
 const statusColors = {
-  present: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-  absent: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
-  upcoming: "bg-primary/10 text-primary dark:bg-primary/20",
+  present:   "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+  absent:    "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
+  Scheduled: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+  Upcoming:  "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+  Ongoing:   "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+  Completed: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400",
 };
 
-const formatDate = (dateStr) => {
-  if (!dateStr) return "—";
-  return new Date(dateStr).toLocaleDateString("en-PH", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+const statusIcon = {
+  present: "check_circle", absent: "cancel",
+  Scheduled: "schedule", Upcoming: "pending_actions", Ongoing: "play_circle", Completed: "task_alt",
 };
 
-const EventAttendance = () => {
-  const [activeTab, setActiveTab] = useState("All");
+const statusLabel = { present: "Attended", absent: "Absent" };
+
+const UserEventAttendance = () => {
+  const [activeTab, setActiveTab]   = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [attendance, setAttendance] = useState([]);
-  const [upcoming, setUpcoming] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [allEvents, setAllEvents]   = useState([]);  // ✅ All events from /api/events
+  const [upcoming, setUpcoming]     = useState([]);
+  const [loading, setLoading]       = useState(true);
+
+  const [allPage, setAllPage]           = useState(1);
+  const [upcomingPage, setUpcomingPage] = useState(1);
+  const [historyPage, setHistoryPage]   = useState(1);
+  const itemsPerPage = 6;
 
   useEffect(() => {
-    const fetchAll = () => {
+    const fetchAll = async () => {
       setLoading(true);
-      Promise.all([
-        axios.get(`${BASE_URL}/attendance/me`, { headers: authHeader() }),
-        axios.get(`${BASE_URL}/events/upcoming`, { headers: authHeader() }),
-      ])
-        .then(([attendanceRes, upcomingRes]) => {
-          setAttendance(attendanceRes.data);
-          setUpcoming(upcomingRes.data);
-        })
-        .catch((err) => console.error("Fetch error:", err))
-        .finally(() => setLoading(false));
+      try {
+        const headers = authHeader();
+        const [attendanceRes, upcomingRes, allEventsRes] = await Promise.all([
+          axios.get(`${BASE_URL}/attendance/me`,   { headers }),
+          axios.get(`${BASE_URL}/events/upcoming`, { headers }),
+          axios.get(`${BASE_URL}/events`,          { headers: {} }), // public
+        ]);
+        setAttendance(attendanceRes.data);
+        setUpcoming(upcomingRes.data);
+        setAllEvents(Array.isArray(allEventsRes.data) ? allEventsRes.data : []);
+      } catch (err) { console.error("Fetch error:", err); }
+      finally { setLoading(false); }
     };
-
     fetchAll();
-    const interval = setInterval(fetchAll, 5000);
-    return () => clearInterval(interval);
   }, []);
 
   const stats = {
-    total: attendance.length,
-    present: attendance.filter((e) => e.status === "present").length,
-    absent: attendance.filter((e) => e.status === "absent").length,
+    total:    allEvents.length,
+    present:  attendance.filter(e => e.status === "present").length,
+    absent:   attendance.filter(e => e.status === "absent").length,
     upcoming: upcoming.length,
   };
 
-  const getFilteredEvents = () => {
-    let list = [];
-    if (activeTab === "All") {
-      list = [
-        ...attendance.map((e) => ({ ...e, _type: "history" })),
-        ...upcoming.map((e) => ({ ...e, _type: "upcoming", status: "upcoming" })),
-      ];
-    } else if (activeTab === "Upcoming") {
-      list = upcoming.map((e) => ({ ...e, _type: "upcoming", status: "upcoming" }));
-    } else if (activeTab === "History") {
-      list = attendance.map((e) => ({ ...e, _type: "history" }));
-    }
+  const statsdata = [
+    { label: "Total Events", icon: "event",           value: stats.total,    changeText: "events",   changeClass: "text-slate-500"   },
+    { label: "Attended",     icon: "how_to_reg",      value: stats.present,  changeText: "attended",  changeClass: "text-emerald-600" },
+    { label: "Absent",       icon: "event_busy",      value: stats.absent,   changeText: "missed",    changeClass: "text-red-500"     },
+    { label: "Upcoming",     icon: "pending_actions", value: stats.upcoming, changeText: "scheduled", changeClass: "text-blue-600"    },
+  ];
 
-    return list.filter((event) => {
-      const name = event.event_name?.toLowerCase() || "";
-      const loc = event.location?.toLowerCase() || "";
-      return name.includes(searchQuery.toLowerCase()) || loc.includes(searchQuery.toLowerCase());
-    });
+  const columns = ["Event Name", "Date", "Start Time", "End Time", "Location", "Check-in", "Status"];
+
+  // ✅ All events tab — from /api/events
+  const allEventsWithStatus = allEvents.map(e => {
+    const myRecord = attendance.find(a => a.event_name === e.event_name && a.event_date?.slice(0,10) === e.event_date?.slice(0,10));
+    return {
+      ...e,
+      _key:         `all-${e.event_id}`,
+      _type:        "all",
+      displayStatus: myRecord ? myRecord.status : e.status,
+      check_in_time: myRecord?.check_in_time || null,
+    };
+  });
+
+  const historyEvents = attendance.map(e => ({ ...e, _key: `history-${e.attendance_id}`, _type: "history" }));
+  const upcomingEvents = upcoming.map(e => ({ ...e, _key: `upcoming-${e.event_id}`, _type: "upcoming", displayStatus: e.status }));
+
+  const applySearch = (list) => list.filter(e => {
+    const name = (e.event_name || "").toLowerCase();
+    const loc  = (e.location   || "").toLowerCase();
+    const q = searchQuery.toLowerCase();
+    return name.includes(q) || loc.includes(q);
+  });
+
+  const filteredAll      = applySearch(allEventsWithStatus);
+  const filteredUpcoming = applySearch(upcomingEvents);
+  const filteredHistory  = applySearch(historyEvents);
+
+  const totalAllPages      = Math.max(1, Math.ceil(filteredAll.length / itemsPerPage));
+  const totalUpcomingPages = Math.max(1, Math.ceil(filteredUpcoming.length / itemsPerPage));
+  const totalHistoryPages  = Math.max(1, Math.ceil(filteredHistory.length / itemsPerPage));
+
+  const paginatedAll      = filteredAll.slice((allPage - 1) * itemsPerPage, allPage * itemsPerPage);
+  const paginatedUpcoming = filteredUpcoming.slice((upcomingPage - 1) * itemsPerPage, upcomingPage * itemsPerPage);
+  const paginatedHistory  = filteredHistory.slice((historyPage - 1) * itemsPerPage, historyPage * itemsPerPage);
+
+  const currentData       = activeTab === "All" ? paginatedAll : activeTab === "Upcoming" ? paginatedUpcoming : paginatedHistory;
+  const currentTotal      = activeTab === "All" ? filteredAll.length : activeTab === "Upcoming" ? filteredUpcoming.length : filteredHistory.length;
+  const currentTotalPages = activeTab === "All" ? totalAllPages : activeTab === "Upcoming" ? totalUpcomingPages : totalHistoryPages;
+  const currentPage       = activeTab === "All" ? allPage : activeTab === "Upcoming" ? upcomingPage : historyPage;
+  const setCurrentPage    = activeTab === "All" ? setAllPage : activeTab === "Upcoming" ? setUpcomingPage : setHistoryPage;
+
+  const renderRow = (event) => {
+    const isHistory  = event._type === "history";
+    const dispStatus = event.displayStatus || event.status;
+    const colorKey   = isHistory ? (event.status || "absent") : (event.status || "Scheduled");
+    return (
+      <tr key={event._key} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+        <td className="px-3 py-2.5 text-xs font-medium text-slate-900 dark:text-white whitespace-nowrap">{event.event_name}</td>
+        <td className="px-3 py-2.5 text-xs text-slate-600 dark:text-slate-400 whitespace-nowrap">{formatDate(event.event_date)}</td>
+        <td className="px-3 py-2.5 text-xs text-slate-600 dark:text-slate-400 whitespace-nowrap">{formatTime(event.start_time)}</td>
+        <td className="px-3 py-2.5 text-xs text-slate-600 dark:text-slate-400 whitespace-nowrap">{formatTime(event.end_time)}</td>
+        <td className="px-3 py-2.5 text-xs text-slate-600 dark:text-slate-400">{event.location || "—"}</td>
+        <td className="px-3 py-2.5 text-xs text-slate-600 dark:text-slate-400 whitespace-nowrap">
+          {event.check_in_time
+            ? new Date(event.check_in_time).toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" })
+            : "—"}
+        </td>
+        <td className="px-3 py-2.5">
+          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold whitespace-nowrap ${statusColors[colorKey] || statusColors.Scheduled}`}>
+            <span className="material-symbols-outlined text-[10px]">{statusIcon[colorKey] || "schedule"}</span>
+            {isHistory ? (statusLabel[event.status] || event.status) : dispStatus}
+          </span>
+        </td>
+      </tr>
+    );
   };
 
-  const filteredEvents = getFilteredEvents();
-
-  return (
-    <main className="flex-1 flex flex-col overflow-y-auto px-3 sm:px-4 md:px-8 py-4 sm:py-6 md:py-8 space-y-4 sm:space-y-6">
-
-      {/* Header */}
-      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-        <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white">
-          My Event Attendance
-        </h2>
-      </header>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-        {[
-          { key: "total", label: "Total", icon: "event", value: stats.total },
-          { key: "present", label: "Attended", icon: "how_to_reg", value: stats.present },
-          { key: "absent", label: "Absent", icon: "event_busy", value: stats.absent },
-          { key: "upcoming", label: "Upcoming", icon: "pending_actions", value: stats.upcoming },
-        ].map((stat) => (
-          <div key={stat.key} className="bg-white dark:bg-slate-900 p-3 sm:p-4 md:p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3 sm:gap-4">
-            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
-              <span className="material-symbols-outlined">{stat.icon}</span>
+  const renderCard = (event) => {
+    const isHistory = event._type === "history";
+    const colorKey  = isHistory ? (event.status || "absent") : (event.status || "Scheduled");
+    return (
+      <div key={event._key} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-3 shadow-sm">
+        <div className="flex justify-between items-start gap-2 mb-2">
+          <p className="text-sm font-bold text-slate-900 dark:text-white truncate flex-1">{event.event_name}</p>
+          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold flex-shrink-0 ${statusColors[colorKey] || statusColors.Scheduled}`}>
+            <span className="material-symbols-outlined text-[10px]">{statusIcon[colorKey] || "schedule"}</span>
+            {isHistory ? (statusLabel[event.status] || event.status) : event.status}
+          </span>
+        </div>
+        <div className="grid grid-cols-2 gap-1.5">
+          <div><p className="text-[9px] text-slate-400 uppercase font-semibold">Date</p><p className="text-xs font-semibold text-slate-700 dark:text-slate-300">{formatDate(event.event_date)}</p></div>
+          <div><p className="text-[9px] text-slate-400 uppercase font-semibold">Location</p><p className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate">{event.location || "—"}</p></div>
+          <div><p className="text-[9px] text-slate-400 uppercase font-semibold">Start</p><p className="text-xs font-semibold text-slate-700 dark:text-slate-300">{formatTime(event.start_time)}</p></div>
+          <div><p className="text-[9px] text-slate-400 uppercase font-semibold">End</p><p className="text-xs font-semibold text-slate-700 dark:text-slate-300">{formatTime(event.end_time)}</p></div>
+          {event.check_in_time && (
+            <div className="col-span-2"><p className="text-[9px] text-slate-400 uppercase font-semibold">Check-in</p>
+              <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">{new Date(event.check_in_time).toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" })}</p>
             </div>
-            <div>
-              <p className="text-[10px] sm:text-sm font-bold text-slate-500 uppercase tracking-widest">{stat.label}</p>
-              <p className="text-xl sm:text-3xl font-black text-slate-900 dark:text-white mt-1">
-                {loading ? <span className="animate-pulse">...</span> : stat.value}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Tabs */}
-      <div className="flex gap-2 sm:gap-4 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
-        {["All", "Upcoming", "History"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`pb-2 text-xs sm:text-sm md:text-base font-bold whitespace-nowrap ${
-              activeTab === tab
-                ? "border-b-2 border-primary text-primary"
-                : "text-slate-500 dark:text-slate-400 hover:text-primary transition-colors"
-            }`}
-          >
-            {tab} Events
-          </button>
-        ))}
-      </div>
-
-      {/* Search */}
-      <div className="w-full sm:max-w-md">
-        <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 material-symbols-outlined text-base">search</span>
-          <input
-            type="text"
-            placeholder="Search event or location..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs sm:text-sm focus:ring-2 focus:ring-primary transition-all"
-          />
+          )}
         </div>
       </div>
+    );
+  };
 
-      {/* Table */}
-      <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-slate-50 dark:bg-slate-800/50">
-              <th className="px-3 md:px-6 py-3 text-[10px] md:text-xs font-bold text-slate-900 dark:text-white">Event Name</th>
-              <th className="px-3 md:px-6 py-3 text-[10px] md:text-xs font-bold text-slate-900 dark:text-white">Date</th>
-              <th className="px-3 md:px-6 py-3 text-[10px] md:text-xs font-bold text-slate-900 dark:text-white">Location</th>
-              <th className="px-3 md:px-6 py-3 text-[10px] md:text-xs font-bold text-slate-900 dark:text-white">Check-in Time</th>
-              <th className="px-3 md:px-6 py-3 text-[10px] md:text-xs font-bold text-slate-900 dark:text-white text-center">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-            {loading ? (
-              <tr><td colSpan={5} className="text-center py-8 text-slate-400">Loading...</td></tr>
-            ) : filteredEvents.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="text-center py-12 text-slate-400">
-                  <span className="material-symbols-outlined text-4xl mb-2 block">event_busy</span>
-                  <p className="text-sm font-medium">No events found</p>
-                </td>
-              </tr>
-            ) : filteredEvents.map((event, i) => (
-              <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                <td className="px-3 md:px-6 py-3 text-xs md:text-sm font-medium text-slate-900 dark:text-white">
-                  {event.event_name}
-                </td>
-                <td className="px-3 md:px-6 py-3 text-xs md:text-sm text-slate-600 dark:text-slate-400">
-                  {formatDate(event.event_date)}
-                </td>
-                <td className="px-3 md:px-6 py-3 text-xs md:text-sm text-slate-600 dark:text-slate-400">
-                  {event.location || "—"}
-                </td>
-                <td className="px-3 md:px-6 py-3 text-xs md:text-sm text-slate-600 dark:text-slate-400">
-                  {event.check_in_time
-                    ? new Date(event.check_in_time).toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" })
-                    : "—"}
-                </td>
-                <td className="px-3 md:px-6 py-3 text-center">
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] md:text-xs font-bold ${statusColors[event.status] || statusColors.absent}`}>
-                    <span className="material-symbols-outlined text-[10px] md:text-xs">
-                      {event.status === "present" ? "check_circle" : event.status === "upcoming" ? "pending_actions" : "cancel"}
-                    </span>
-                    {event.status === "present" ? "Attended" : event.status === "upcoming" ? "Upcoming" : "Absent"}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+  return (
+    <main className="flex-1 flex flex-col overflow-y-auto px-3 sm:px-4 md:px-8 py-4 sm:py-6 md:py-8">
+      <div className="flex flex-col gap-4 sm:gap-6">
+
+        {/* ── Header ── */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3
+          bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="material-symbols-outlined text-primary text-lg">event_available</span>
+              <span className="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">PWD Event Attendance</span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">Event Attendance</h1>
+            <p className="text-slate-500 dark:text-slate-400 mt-1 text-xs sm:text-sm">View and manage your event participation records</p>
+          </div>
+        </div>
+
+        {/* ── Stats ── */}
+        {loading ? <StatCardsLoader count={4} /> : (
+          <StatsGrid>
+            {statsdata.map((stat, idx) => <StatsCards key={idx} stat={stat} />)}
+          </StatsGrid>
+        )}
+
+        {/* ── Tabs ── */}
+        <div className="flex gap-1 sm:gap-2 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
+          {["All", "Upcoming", "History"].map((tab) => (
+            <button key={tab} onClick={() => { setActiveTab(tab); setAllPage(1); setUpcomingPage(1); setHistoryPage(1); }}
+              className={`pb-3 px-3 text-xs sm:text-sm font-bold whitespace-nowrap transition-colors border-b-2 -mb-px ${
+                activeTab === tab
+                  ? "border-primary text-primary"
+                  : "border-transparent text-slate-500 dark:text-slate-400 hover:text-primary"}`}>
+              {tab} Events
+              <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
+                {tab === "All" ? filteredAll.length : tab === "Upcoming" ? filteredUpcoming.length : filteredHistory.length}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/* ── Search ── */}
+        <SearchBar
+          searchValue={searchQuery}
+          setSearchValue={(val) => { setSearchQuery(val); setAllPage(1); setUpcomingPage(1); setHistoryPage(1); }}
+          placeholder="Search event or location..."
+        />
+
+        {/* ── Table ── */}
+        {loading ? <TableLoader rows={6} cols={columns.length} /> : (
+          <DataTable
+            columns={columns}
+            data={currentData}
+            renderRow={renderRow}
+            renderCard={renderCard}
+            empty={activeTab === "Upcoming" ? "No upcoming events." : "No events found."}
+            pagination={
+              <Pagination
+                currentPage={currentPage}
+                totalPages={currentTotalPages}
+                totalItems={currentTotal}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+              />
+            }
+          />
+        )}
       </div>
     </main>
   );
 };
 
-export default EventAttendance;
+export default UserEventAttendance;

@@ -23,15 +23,28 @@ const distributionRoutes = require("./routes/inventory/distribution.routes");
 //health routes
 const healthRoutes = require("./routes/health/health.routes");
 
+//sms routes
+const smsRoutes = require('./routes/SMS/sms_notification.routes');
+
 //attendance routes
 const eventRoutes = require("./routes/event/event.routes");
 const eventAttendanceRoutes = require("./routes/event/event_attendance.routes");
+
+//announcement routes
+const announcementRoutes = require("./routes/Announcement/announcements.routes");
 
 //settings routes
 const accessRoutes = require("./routes/settings/access.routes");
 const userRoutes = require("./routes/settings/user.routes");
 
+//recentLogs routes
+const logRoutes = require("./routes/recentLog/recentLog.routes");
 
+//searchbar routes
+const searchRoutes = require("./routes/searchbar/searchbar.routes");
+
+//landing routes
+const landingRoutes = require("./routes/landing/landingstats.routes");
 
 const app = express();
 app.use(express.json());
@@ -66,15 +79,28 @@ app.use("/api/distribution", distributionRoutes);
 //health API
 app.use("/api/health", healthRoutes);
 
+//sms API
+app.use('/api/sms', smsRoutes);
+
 //events and attendance API
 app.use("/api/events", eventRoutes);
 app.use("/api/attendance", eventAttendanceRoutes);
+
+//announcement API
+app.use("/api/announcements", announcementRoutes);
 
 //settings API
 app.use("/api/access", accessRoutes);
 app.use("/api/users", userRoutes);
 
+//recentLogs API
+app.use("/api/logs", logRoutes);
 
+//searchbar API
+app.use("/api/search", searchRoutes);
+
+//landing API
+app.use("/api/stats", landingRoutes);
 
 const PORT = process.env.PORT || 5000;
 

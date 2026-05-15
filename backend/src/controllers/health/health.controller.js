@@ -1,4 +1,5 @@
 const Health = require("../../models/health/healthModel");
+const log = require("../../helper/recentLog/RecentLogHelper")
 
 exports.getAllHealth = (req, res) => {
   Health.getAll((err, results) => {
@@ -21,6 +22,7 @@ exports.createHealth = (req, res) => {
   Health.create(req.body, (err, result) => {
     console.error("DB Error:", err);
     if (err) return res.status(500).json(err);
+    log(req.user?.id, `Added health record`, "Health Record", `PWD ID: ${req.body.pwd_id}, Status: ${req.body.health_status}`);
     res.json({ message: "Health record created", id: result.insertId });
   });
 };
@@ -30,6 +32,7 @@ exports.updateHealth = (req, res) => {
 
   Health.update(id, req.body, (err) => {
     if (err) return res.status(500).json(err);
+    log(req.user?.id, `Updated health record`, "Health Record", `Health ID: ${req.params.id}`);
     res.json({ message: "Health record updated" });
   });
 };
@@ -39,6 +42,7 @@ exports.deleteHealth = (req, res) => {
 
   Health.delete(id, (err) => {
     if (err) return res.status(500).json(err);
+    log(req.user?.id, `Deleted health record`, "Health Record", `Health ID: ${req.params.id}`);
     res.json({ message: "Health record deleted" });
   });
 };

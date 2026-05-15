@@ -1,11 +1,12 @@
+require("dotenv").config();
 const mysql = require("mysql2");
 
 const db = mysql.createConnection({
-  host: process.env.DB_HOST || "localhost",
-  port: process.env.DB_PORT || 3306,
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
-  database: process.env.DB_NAME || "railway"
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
 });
 
 db.connect((err) => {
@@ -13,6 +14,7 @@ db.connect((err) => {
     console.error("Database connection failed:", err.message);
     return;
   }
+  db.query("SET time_zone = '+08:00'");
   console.log("Connected to MySQL database!");
 });
 

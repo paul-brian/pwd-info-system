@@ -1,6 +1,7 @@
 const db = require("../../config/db");
 const bcrypt = require("bcrypt");
-const PWD = require("../../models/profiling/pwd_profile.models"); // kung kailangan ng model para update/get/delete
+const PWD = require("../../models/profiling/pwd_profile.models");
+const log = require("../../helper/recentLog/RecentLogHelper")
 
 // ---------------- CREATE PWD PROFILE + USER LOGIN ----------------
 exports.createProfile = async (req, res) => {
@@ -63,6 +64,8 @@ exports.createProfile = async (req, res) => {
           db.commit((err) => {
             if (err) return db.rollback(() => res.status(500).json(err));
 
+          log(req.user?.id, `Registered new PWD: ${full_name}`, "PWD Registration", `PWD Number: ${pwd_number}`);
+
             res.json({ message: "PWD Profile + Login Account Created Successfully!" });
           });
         });
@@ -104,6 +107,7 @@ exports.updateProfile = (req, res) => {
           const userId = rows[0].user_id;
           db.query("UPDATE user SET password=? WHERE user_id=?", [hashedPassword, userId], (err3) => {
             if (err3) return res.status(500).json(err3);
+            log(req.user?.id, `Updated PWD profile & password`, "PWD Registration", `PWD ID: ${id}`);
             return res.json({ message: "Profile and password updated!" });
           });
         });
@@ -121,6 +125,7 @@ exports.updateProfile = (req, res) => {
           const updateUserSql = "UPDATE user SET status=? WHERE user_id=?";
           db.query(updateUserSql, [data.status, userId], (err3) => {
             if (err3) return res.status(500).json(err3);
+            log(req.user?.id, `Updated PWD profile status to ${data.status}`, "PWD Registration", `PWD ID: ${id}`);
             return res.json({ message: "Profile updated!" });
           });
         } else {
@@ -128,6 +133,7 @@ exports.updateProfile = (req, res) => {
         }
       });
     } else {
+      log(req.user?.id, `Updated PWD profile`, "PWD Registration", `PWD ID: ${id}`);
       res.json({ message: "Profile updated!" });
     }
   });
@@ -154,6 +160,7 @@ exports.deleteProfile = (req, res) => {
         const updateUserSql = "UPDATE user SET status='inactive' WHERE user_id=?";
         db.query(updateUserSql, [userId], (err3) => {
           if (err3) return res.status(500).json(err3);
+          log(req.user?.id, `Deactivated PWD profile`, "PWD Registration", `PWD ID: ${id}`);
           res.json({ message: "Profile soft-deleted and user deactivated!" });
         });
       } else {
@@ -210,6 +217,7 @@ exports.updateMyProfile = (req, res) => {
       if (err) return res.status(500).json({ error: err.message });
       if (result.affectedRows === 0)
         return res.status(404).json({ error: "PWD profile not found" });
+        log(userId, `PWD updated own profile`, "PWD Registration", `User ID: ${userId}`);
       res.json({ message: "PWD profile updated successfully" });
     }
   );

@@ -1,4 +1,5 @@
 const Distribution = require("../../models/inventory/distributionModel");
+const log = require("../../helper/recentLog/RecentLogHelper")
 
 exports.getAll = (req, res) => {
   Distribution.getAll((err, results) => {
@@ -10,6 +11,7 @@ exports.getAll = (req, res) => {
 exports.create = (req, res) => {
   Distribution.create(req.body, (err) => {
     if (err) return res.status(400).json({ error: err.message });
+    log(req.user?.id, `Released assistance to PWD`, "Assistance/Distribution", `PWD ID: ${req.body.beneficiary_id}, Item ID: ${req.body.item_id}, Qty: ${req.body.quantity}`);
     res.json({ message: "Assistance released successfully" });
   });
 };

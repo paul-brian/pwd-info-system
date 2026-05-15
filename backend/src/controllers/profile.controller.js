@@ -1,4 +1,5 @@
 const db = require("../config/db");
+const log = require("..//helper/recentLog/RecentLogHelper")
 const bcrypt = require("bcrypt");
 
 exports.getProfile = (req, res) => {
@@ -34,12 +35,12 @@ exports.updateProfile = (req, res) => {
 
   db.query(sql, [full_name, email, userId], (err) => {
     if (err) return res.status(500).json({ error: err.message });
+    log(userId, `Updated own profile`, "User Login/Logout", `Name: ${full_name}`);
     res.json({ message: "Profile updated" });
   });
 };
 
-// ✅ FIX: Huwag gumamit ng async sa loob ng db.query callback
-// Gamitin ang Promise-based approach para maiwasan ang error
+
 exports.changePassword = (req, res) => {
   const userId = req.user.id;
   const { oldPassword, newPassword } = req.body;
@@ -56,7 +57,6 @@ exports.changePassword = (req, res) => {
 
     const hashedPassword = result[0].password;
 
-    // ✅ FIX: i-compare OUTSIDE ng db.query callback gamit ang .then()
     bcrypt
       .compare(oldPassword, hashedPassword)
       .then((match) => {
@@ -66,14 +66,14 @@ exports.changePassword = (req, res) => {
         return bcrypt.hash(newPassword, 10);
       })
       .then((hash) => {
-        if (!hash) return; // already responded above
+        if (!hash) return; 
 
-        // ✅ FIX: may callback na ang update query
         db.query(
           `UPDATE user SET password = ? WHERE user_id = ?`,
           [hash, userId],
           (err) => {
             if (err) return res.status(500).json({ error: err.message });
+            log(userId, `Changed password`, "User Login/Logout", `User ID: ${userId}`);
             res.json({ message: "Password updated" });
           }
         );
@@ -87,7 +87,7 @@ exports.changePassword = (req, res) => {
 exports.uploadProfileImage = (req, res) => {
   const userId = req.user.id;
 
-  // ✅ FIX: check kung may uploaded file
+
   if (!req.file)
     return res.status(400).json({ error: "No image file uploaded" });
 
@@ -97,6 +97,7 @@ exports.uploadProfileImage = (req, res) => {
 
   db.query(sql, [image, userId], (err) => {
     if (err) return res.status(500).json({ error: err.message });
+    log(userId, `Updated profile image`, "User Login/Logout", `User ID: ${userId}`);
     res.json({ message: "Image updated", image });
   });
 };
